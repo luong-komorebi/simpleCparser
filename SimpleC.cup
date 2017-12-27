@@ -120,7 +120,9 @@ non terminal LinkedList       declList;
 non terminal Decl           decl;
 non terminal LinkedList       varDeclList;
 non terminal VarDecl      varDecl;
+non terminal FuncDecl       funcDecl;
 non terminal FuncDef       funcDef;
+non terminal StructDecl     structDecl;
 non terminal FormalsList  formals;
 non terminal FuncBody       funcBody;
 non terminal LinkedList       stmtList;
@@ -156,6 +158,8 @@ declList ::= declList: dl decl: d {: dl.addLast(d); RESULT = dl; :}
 
 decl ::= varDecl: v {: RESULT = v; :}
        | funcDef: f {: RESULT = f; :}
+       | funcDecl: f {: RESULT = f; :}
+       | structDecl: s {: RESULT = s; :}
        ;
 
 /* http://www2.cs.tum.edu/projects/cup/
@@ -166,6 +170,9 @@ varDecl ::= type: t id: i SEMICOLON
           | type: t id: i LSQBRACKET INTLITERAL: il RSQBRACKET SEMICOLON
             {: RESULT = new VarDecl(t, i, new IntLiteral(il)); :}
           ;
+
+funcDecl ::= type: t id: i formals: f SEMICOLON {: RESULT = new FuncDecl(t, i, f); :}
+            ;
 
 funcDef ::= type: t id: i formals: f funcBody: body {: RESULT = new FuncDef(t, 0, i, f, body); :}
          ;
@@ -185,6 +192,9 @@ formalsList ::= formalDecl: fmd  {:
 formalDecl ::= type: t id: i {: RESULT = new FormalDecl(t, i); :}
           ;
 
+structDecl ::= STRUCT id: i LCURLY varDeclList: v RCURLY SEMICOLON
+            {: RESULT = new StructDecl(i, new VarDeclList(v)); :}
+            ;
 funcBody ::= LCURLY varDeclList: v stmtList: s RCURLY
               {: RESULT = new FuncBody(new DeclList(v), new StmtList(s)); :}
          ;
@@ -217,6 +227,8 @@ term ::= loc: l {: RESULT = l; :}
 
 type ::= INT {: RESULT = new IntType(); :}
        | VOID {: RESULT = new VoidType(); :}
+       | BOOL {: RESULT = new BoolType(); :}
+       | DOUBLE {: RESULT = new DoubleType(); :}
        ;
 
 loc ::= id: i {: RESULT = i; :}

@@ -1,5 +1,38 @@
 Program
   DeclList
+    FuncDecl
+    Type (VOID)
+    ID (swap)
+    LPAREN
+      FormalsList
+        FormalDecl
+          Type (INT)
+          ID (a)
+        COMMA
+        FormalDecl
+          Type (INT)
+          ID (b)
+    RPAREN
+    SEMICOLON
+    StructDecl
+    STRUCT
+    ID (aloha)
+    LCURLY
+      VarDeclList
+        VarDecl
+          Type (INT)
+          ID (a)
+          SEMICOLON
+        VarDecl
+          Type (INT)
+          ID (b)
+          SEMICOLON
+        VarDecl
+          Type (BOOL)
+          ID (c)
+          SEMICOLON
+    RCURLY
+    SEMICOLON
     FuncDef
       Type (VOID)
       ID (main)
@@ -12,6 +45,10 @@ Program
         FormalDecl
           Type (INT)
           ID (b)
+        COMMA
+        FormalDecl
+          Type (BOOL)
+          ID (c)
       RPAREN
       FuncBody
         LCURLY
@@ -23,6 +60,14 @@ Program
             VarDecl
               Type (INT)
               ID (b)
+              SEMICOLON
+            VarDecl
+              Type (BOOL)
+              ID (f)
+              SEMICOLON
+            VarDecl
+              Type (DOUBLE)
+              ID (g)
               SEMICOLON
           StmtList
         RCURLY

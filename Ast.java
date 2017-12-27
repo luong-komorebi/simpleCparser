@@ -82,11 +82,24 @@ class DeclList extends AST {
     protected LinkedList<?> myDecls;
 }
 
-class StructDeclList extends DeclList {
-    public StructDeclList(LinkedList<?> S) {
-        super(S);
-    }
+class VarDeclList extends AST {
+  public VarDeclList(LinkedList<?> D) {
+      myVarDecls = D;
+  }
 
+  public void print(PrintWriter pw, int indentLevel) {
+      Iterator<?> it = myVarDecls.iterator();
+      try {
+          printNonTerm(pw, indentLevel);
+          while (it.hasNext()) {
+              ((VarDecl)it.next()).print(pw, indentLevel + 1);
+          }
+      } catch (Exception e) {
+        e.printStackTrace(System.err);
+      }
+  }
+
+  protected LinkedList<?> myVarDecls;
 }
 
 class FormalsList extends AST {
@@ -154,8 +167,7 @@ class StmtList extends AST {
 }
 
 abstract class Decl extends AST {
-    // added
-    //public abstract void print(PrintWriter pw, int indentLevel);
+
 }
 
 class VarDecl extends Decl {
@@ -217,6 +229,29 @@ class FuncDef extends Decl {
     private FuncBody    myBody;
 }
 
+class FuncDecl extends Decl {
+    public FuncDecl(Type type, ID id, FormalsList formalsList) {
+        myType = type;
+        myId = id;
+        myFormalsList = formalsList;
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        printNonTerm(pw, indentLevel);
+
+        myType.print(pw, indentLevel);
+        myId.print(pw, indentLevel);
+        printTerm(pw, indentLevel, LPAREN);
+        myFormalsList.print(pw, indentLevel + 1);
+        printTerm(pw, indentLevel, RPAREN);
+        printTerm(pw, indentLevel, SEMICOLON);
+    }
+
+    private Type myType;
+    private ID myId;
+    private FormalsList myFormalsList;
+}
+
 class FormalDecl extends Decl {
     public FormalDecl(Type type, ID id) {
         myType = type;
@@ -232,6 +267,27 @@ class FormalDecl extends Decl {
 
     private Type myType;
     private ID   myId;
+}
+
+// added
+class StructDecl extends Decl {
+    public StructDecl(ID id, VarDeclList varDeclList) {
+        myId = id;
+        myvarDeclList = varDeclList;
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        printNonTerm(pw, indentLevel);
+        printTerm(pw, indentLevel, STRUCT);
+        myId.print(pw, indentLevel);
+        printTerm(pw, indentLevel, LCURLY);
+        myvarDeclList.print(pw, indentLevel + 1);
+        printTerm(pw, indentLevel, RCURLY);
+        printTerm(pw, indentLevel, SEMICOLON);
+    }
+
+    private ID myId;
+    private VarDeclList myvarDeclList;
 }
 
 // **********************************************************************
