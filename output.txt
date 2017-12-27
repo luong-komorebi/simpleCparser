@@ -52,7 +52,7 @@ Program
       RPAREN
       FuncBody
         LCURLY
-          DeclList
+          VarDeclList
             VarDecl
               Type (INT)
               ID (a)

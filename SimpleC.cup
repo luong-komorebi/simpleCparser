@@ -196,7 +196,7 @@ structDecl ::= STRUCT id: i LCURLY varDeclList: v RCURLY SEMICOLON
             {: RESULT = new StructDecl(i, new VarDeclList(v)); :}
             ;
 funcBody ::= LCURLY varDeclList: v stmtList: s RCURLY
-              {: RESULT = new FuncBody(new DeclList(v), new StmtList(s)); :}
+              {: RESULT = new FuncBody(new VarDeclList(v), new StmtList(s)); :}
          ;
 
 varDeclList ::= varDeclList: l varDecl: var {: l.addLast(var); RESULT = l; :}

@@ -126,8 +126,8 @@ class FormalsList extends AST {
 }
 
 class FuncBody extends AST {
-    public FuncBody(DeclList declList, StmtList stmtList) {
-        myDeclList = declList;
+    public FuncBody(VarDeclList varDeclList, StmtList stmtList) {
+        myVarDeclList = varDeclList;
         myStmtList = stmtList;
     }
     // added
@@ -135,13 +135,13 @@ class FuncBody extends AST {
         printNonTerm(pw, indentLevel);
         printTerm(pw, indentLevel + 1, LCURLY);
 
-        myDeclList.print(pw, indentLevel + 2);
+        myVarDeclList.print(pw, indentLevel + 2);
         myStmtList.print(pw, indentLevel + 2);
 
         printTerm(pw, indentLevel + 1, RCURLY);
     }
 
-    private DeclList myDeclList;
+    private VarDeclList myVarDeclList;
     private StmtList myStmtList;
 }
 
