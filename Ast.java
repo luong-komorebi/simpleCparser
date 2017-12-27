@@ -383,6 +383,13 @@ abstract class BinaryExpr extends Expr {
         myExp2 = exp2;
     }
 
+    public void print(PrintWriter pw, int indentLevel, int token) {
+        printNonTerm(pw, indentLevel);
+        myExp1.print(pw, indentLevel + 1);
+        printTerm(pw, indentLevel + 1, token);
+        myExp2.print(pw, indentLevel + 1);
+    }
+
     protected Expr myExp1;
     protected Expr myExp2;
 }
@@ -393,7 +400,7 @@ class PlusExpr extends BinaryExpr {
     }
 
     public void print(PrintWriter pw, int indentLevel) {
-
+        print(pw, indentLevel, PLUS);
     }
 }
 
@@ -403,9 +410,120 @@ class MinusExpr extends BinaryExpr {
     }
 
     public void print(PrintWriter pw, int indentLevel) {
-
+        print(pw, indentLevel, MINUS);
     }
 }
+
+class TimesExpr extends BinaryExpr {
+    public TimesExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, TIMES);
+    }
+}
+
+class DivideExpr extends BinaryExpr {
+    public DivideExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, DIVIDE);
+    }
+}
+
+class PercentExpr extends BinaryExpr {
+    public PercentExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, PERCENT);
+    }
+}
+
+class AndExpr extends BinaryExpr {
+    public AndExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, AMPERSAND);
+    }
+}
+
+class OrExpr extends BinaryExpr {
+    public OrExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, VERTICALBAR);
+    }
+}
+
+class EqualsExpr extends BinaryExpr {
+    public EqualsExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, EQUALS);
+    }
+}
+
+class NotEqualsExpr extends BinaryExpr {
+    public NotEqualsExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, NE_OP);
+    }
+}
+
+class LessExpr extends BinaryExpr {
+    public LessExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, LESS);
+    }
+}
+
+class GreaterExpr extends BinaryExpr {
+    public GreaterExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, GREATER);
+    }
+}
+
+class LessEqExpr extends BinaryExpr {
+    public LessEqExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, LE_OP);
+    }
+}
+
+class GreaterEqExpr extends BinaryExpr {
+    public GreaterEqExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, GE_OP);
+    }
+}
+
 
 // **********************************************************************
 // Stmt

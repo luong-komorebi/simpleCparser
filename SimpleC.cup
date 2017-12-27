@@ -68,6 +68,7 @@ terminal            SUB_ASSIGN;
 terminal            MUL_ASSIGN;
 terminal            DIV_ASSIGN;
 terminal            PERCENT;
+terminal            COLON;
 
 terminal            EXTERN;
 terminal            COMMENTBLOCK;
@@ -219,6 +220,17 @@ exp ::= binaryExpr: b {: RESULT = b; :}
 
 binaryExpr ::= exp: e1 PLUS exp: e2 {: RESULT = new PlusExpr(e1, e2); :}
         | exp: e1 MINUS exp: e2 {: RESULT = new MinusExpr(e1, e2); :}
+        | exp: e1 TIMES exp: e2 {: RESULT = new TimesExpr(e1, e2); :}
+        | exp: e1 DIVIDE exp: e2 {: RESULT = new DivideExpr(e1, e2); :}
+        | exp: e1 PERCENT exp: e2 {: RESULT = new PercentExpr(e1, e2); :}
+        | exp: e1 AMPERSAND exp: e2 {: RESULT = new AndExpr(e1, e2); :}
+        | exp: e1 VERTICALBAR exp: e2 {: RESULT = new OrExpr(e1, e2); :}
+        | exp: e1 EQUALS exp: e2 {: RESULT = new EqualsExpr(e1, e2); :}
+        | exp: e1 NE_OP exp: e2 {: RESULT = new NotEqualsExpr(e1, e2); :}
+        | exp: e1 LESS exp: e2 {: RESULT = new LessExpr(e1, e2); :}
+        | exp: e1 GREATER exp: e2 {: RESULT = new GreaterExpr(e1, e2); :}
+        | exp: e1 LE_OP exp: e2 {: RESULT = new LessEqExpr(e1, e2); :}
+        | exp: e1 GE_OP exp: e2 {: RESULT = new GreaterEqExpr(e1, e2); :}
         ;
 
 term ::= loc: l {: RESULT = l; :}
