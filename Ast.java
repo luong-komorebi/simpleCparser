@@ -356,7 +356,7 @@ class MinusExpr extends BinaryExpr {
 // **********************************************************************
 
 abstract class Stmt extends AST {
-
+	Stmt() {} //empty constructor so that some method doesnt invoke error missing method
 }
 
 class AssignStmt extends Stmt {
@@ -366,9 +366,153 @@ class AssignStmt extends Stmt {
     }
 
     public void print(PrintWriter pw, int indentLevel) {
-
+		printNonTerm(pw, indentLevel);
+		myLhs.print(pw, indent + 1);
+	    printTerm(p, indent, ASSIGN);
+	    myExp.print(p, indent);
+	    printTerm(p, indent, SEMICOLON);
     }
 
     private Expr myLhs;
     private Expr myExp;
 }
+
+class IfStmt extends Stmt {
+  
+    public IfStmt(Expr exp, VarDeclList dlist, StmtList slist)
+    {
+      myVarDeclList = dlist;
+      myExp = exp;
+      myStmtList = slist;
+    }
+  
+    public void print(PrintWriter p, int indent) {
+      printNonTerm(p, indent);
+      printTerm(p, indent + 1, IF);
+      printTerm(p, indent + 1, LPAREN);
+      myExp.print(p, indent + 1);
+      printTerm(p, indent + 1, RPAREN);
+      printTerm(p, indent + 1, LCURLY);
+      myVarDeclList.print(p, indent + 1);
+      myStmtList.print(p, indent + 1);
+      printTerm(p, indent + 1, RCURLY);
+    }
+	
+    private Expr myExp;
+    private DeclList myVarDeclList;
+    private StmtList myStmtList;
+}
+
+class IfElseStmt extends Stmt { 
+	
+  public IfElseStmt(Expr exp, VarDeclList l1, StmtList stm1, VarDeclList l2, StmtList stm2) {
+    myExp = exp;
+    myVarDeclList1 = l1;
+	myVarDeclList2 = l2;
+    myStmtList1 = stm1;
+    myStmtList2 = stm2;
+  }
+  
+  public void print(PrintWriter p, int indent) {
+    printNonTerm(p, indent)
+    printTerm(p, indent + 1, IF);
+    printTerm(p, indent + 1, LPAREN);
+    myExp.print(p, indent + 1);
+    printTerm(p, indent + 1, RPAREN);
+    printTerm(p, indent + 1, LCURLY);
+    myVarDeclList1.print(p, indent + 1);
+    myStmtList1.print(p, indent + 1);
+    printTerm(p, indent + 1, RCURLY);
+    printTerm(p, indent + 1, ELSE);
+	printTerm(p, indent + 1, LCURLY);
+    myVarDeclList2.print(p, indent + 1);
+    myStmtList2.print(p, indent + 1);
+    printTerm(p, indent + 1, RCURLY);
+  }
+  
+  private Expr myExp;
+  private VarDeclList myVarDeclList1;
+  private VarDeclList myVarDeclList2;
+  private StmtList myStmtList1;
+  private StmtList myStmtList2;
+}
+
+class ForStmt extends Stmt { 
+	
+  public ForStmt(Stmt init, Expr cond, Stmt incr, VarDeclList declist, StmtList stmlist) {
+    myInit = init;
+    myCond = cond;
+    myIncr = incr;
+    myVarDeclList = declist;
+    myStmtList = stmlist;
+  }
+  
+  public void print(PrintWriter p, int indent) {
+    printNonTerm(p, indent);
+    printTerm(p, indent+1, FOR);
+    printTerm(p, indent+1, LPAREN);
+    myInit.print(p, indent+1);
+    printTerm(p, indent+1, SEMICOLON);
+    myCond.print(p, indent+1);
+    printTerm(p, indent+1, SEMICOLON);
+    myIncr.print(p, indent+1);
+    printTerm(p, indent+1, RPAREN);
+    printTerm(p, indent+1, LCURLY);
+    myVarDeclList.print(p, indent+1);
+    myStmtList.print(p, indent+1);
+    printTerm(p, indent+1, RCURLY);
+  }
+  
+  private Stmt myInit;
+  private Expr myCond;
+  private Stmt myIncr;
+  private VarDeclList myVarDeclList;
+  private StmtList myStmtList;
+}
+
+class WhileStmt extends Stmt {
+	
+  public WhileStmt(Expr exp, VarDeclList list, StmtList slist) {
+    myExp = exp;
+    myVarDeclList = list;
+    myStmtList = slist;
+  }
+  
+  public void print(PrintWriter p, int indent) {
+    printNonTerm(p, indent);
+    printTerm(p, indent+1, WHILE);
+    printTerm(p, indent+1, LPAREN);
+    myExp.print(p, indent+1);
+    printTerm(p, indent+1, RPAREN);
+    printTerm(p, indent+1, LCURLY);
+    myVarDeclList.print(p, indent+1);
+    myStmtList.print(p, indent+1);
+    printTerm(p, indent+1, RCURLY);
+  }
+  
+  private Expr myExp;
+  private VarDeclList myVarDeclList;
+  private StmtList myStmtList;
+}
+
+class ReturnStmt extends Stmt { 
+  public ReturnStmt(Expr exp) {
+    myExp = exp;
+  }
+  
+  public void print(PrintWriter p, int indent) {
+    printNonTerm(p, indent);
+    if (myExp == null) {
+      printTerm(p, indent+1, RETURN);
+    } else {
+      printTerm(p, indent+1, RETURN);
+      myExp.print(p, indent+1);
+      printTerm(p, indent+1, SEMICOLON);
+    }
+  }
+  
+  private Expr myExp;
+}
+
+
+

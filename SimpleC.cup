@@ -131,6 +131,13 @@ non terminal Type           type;
 non terminal Expr          loc;
 non terminal ID           id;
 non terminal Stmt         assignStmt;
+non terminal Stmt		ifStmt;
+non terminal Stmt		ifElseStmt;
+non terminal Stmt		forStmt;
+non terminal Stmt		forInitStmt;
+non terminal Stmt		whileStmt;
+non terminal Stmt		returnStmt;
+
 
 // added
 non terminal FormalDecl formalDecl;
@@ -198,10 +205,42 @@ stmtList ::= stmtList: l stmt: s {: l.addLast(s); RESULT = l; :}
           ;
 
 stmt ::= assignStmt:a SEMICOLON {: RESULT = a; :}
-      ;
+      	| ifStmt:b if {: RESULT = b; :}
+		| ifElseStmt:c ifElse {: RESULT = c; :}
+		| forStmt:d fstm {: RESULT = d; :}
+		| whileStmt:e whstm {: RESULT = e; :}
+		| returnStmt:f rtstm {: RESULT = f; :}
+		| callStmt:g callstm {: RESULT = g; :}
+		;
 
 assignStmt ::= loc: l ASSIGN exp: e {: RESULT = new AssignStmt(l, e); :}
+			| loc: l ADD_ASSIGN exp: e {: RESULT = new AssignmentStmt(l,e); :}
+			| loc: l SUB_ASSIGN exp: e {: RESULT = new AssignmentStmt(l,e); :}
+			| loc: l MUL_ASSIGN exp: e {: RESULT = new AssignmentStmt(l,e); :}
+			| loc: l DIV_ASSIGN exp: e {: RESULT = new AssignmentStmt(l,e); :}
          ;
+
+ifStmt ::= IF LPAREN exp: e RPAREN LCURLY varDeclList: l stmtList: stm RCURLY {: 
+			RESULT = new IfStmt(e, l, stm);
+		:}
+		;
+		
+ifElseStmt ::= IF LPAREN exp: e RPAREN LCURLY varDeclList: l1 stmtList: stm1 RCURLY ELSE LCURLY varDeclList: l2 stmtList: stm2 RCURLY {: RESULT = new IfElseStmt(e, l1, l2, stm1, stm2); :}
+		;
+		
+forStmt ::= FOR LPAREN forInitStmt: init1 SEMICOLON exp: e SEMICOLON forInitStmt: init2 RPAREN LCURLY varDeclList: l stmtList: stm RCURLY {: REUSLT = new ForStmt(init1, e, init2, l, stm); :}
+		;
+		
+forInitStmt ::=  assignStmt: a {: RESULT = a; :}
+			| /* epsilon */ {: RESULT = new Stmt(); :}
+		;
+		
+whileStmt ::= WHILE LPAREN exp:e RPAREN LCURLY varDeclList: l stmtList: stm RCURLY {: RESULT = new WhileStmt(e, l, stm); :}
+		;
+			
+returnStmt ::= RETURN exp: e SEMICOLON  {: RESULT = new ReturnStmt(e); :}
+		| RETURN SEMICOLON {: RESULT = new ReturnStmt(); :}
+		;
 
 exp ::= binaryExpr: b {: RESULT = b; :}
       | term: t {: RESULT = t; :}
