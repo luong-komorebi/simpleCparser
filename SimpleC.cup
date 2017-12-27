@@ -1,0 +1,226 @@
+import java_cup.runtime.*;
+import java.util.*;
+
+
+parser code {:
+
+public void syntax_error(Symbol curToken) {
+    if (curToken.value == null) {
+       Errors.fatal(0,0, "SYNTAX ERROR at end of file");
+    }
+    else {
+       MySymbol cur = (MySymbol)curToken;
+       Errors.fatal(cur.getLine(), cur.getColumn(),
+            "SYNTAX ERROR while reading token " + ((Scanner)this.getScanner()).getTokName(cur.sym) + " ("+ ((Scanner)this.getScanner()).yytext() + ")");
+    }
+    System.exit(-1);
+}
+
+:};
+
+
+/* Terminals */
+
+terminal            INT;
+terminal            BOOL;
+terminal            VOID;
+terminal Boolean    TRUE;
+terminal Boolean    FALSE;
+terminal            NULL;
+terminal            IF;
+terminal            ELSE;
+terminal            WHILE;
+terminal            FOR;
+terminal            RETURN;
+terminal String     ID;
+terminal Integer    INTLITERAL;
+terminal String     STRINGLITERAL;
+terminal Double     REALLITERAL;
+terminal Char       CHARLITERAL;
+terminal            LCURLY;
+terminal            RCURLY;
+terminal            LSQBRACKET;
+terminal            RSQBRACKET;
+terminal            LPAREN;
+terminal            RPAREN;
+terminal            COMMA;
+terminal            ASSIGN;
+terminal            SEMICOLON;
+terminal            PLUS;
+terminal            MINUS;
+terminal            TIMES;
+terminal            DIVIDE;
+terminal            BANG;
+terminal            AND_OP;
+terminal            OR_OP;
+terminal            EQUALS;
+terminal            NE_OP;
+terminal            LESS;
+terminal            GREATER;
+terminal            LE_OP;
+terminal            GE_OP;
+terminal            AMPERSAND;
+terminal            SIZEOF;
+terminal            FULLSTOP;
+terminal            STRUCT;
+terminal            ADD_ASSIGN;
+terminal            SUB_ASSIGN;
+terminal            MUL_ASSIGN;
+terminal            DIV_ASSIGN;
+terminal            PERCENT;
+
+terminal            EXTERN;
+terminal            COMMENTBLOCK;
+terminal            COMMENTLINE;
+terminal            AUTO;
+terminal            BREAK;
+terminal            CASE;
+terminal            CHAR;
+terminal            CONTINUE;
+terminal            DEFAULT;
+terminal            DOUBLE;
+terminal            ENUM;
+terminal            GOTO;
+terminal            LONG;
+terminal            REGISTER;
+terminal            SHORT;
+terminal            SIGNED;
+terminal            STATIC;
+terminal            SWITCH;
+terminal            TYPEDEF;
+terminal            UNION;
+terminal            UNSIGNED;
+terminal            VOLATILE;
+terminal            ELLIPSIS;
+terminal            RIGHT_ASSIGN;
+terminal            LEFT_ASSIGN;
+terminal            MOD_ASSIGN;
+terminal            AND_ASSIGN;
+terminal            XOR_ASSIGN;
+terminal            OR_ASSIGN;
+terminal            RIGHT_OP;
+terminal            LEFT_OP;
+terminal            INC_OP;
+terminal            DEC_OP;
+terminal            PTR_OP;
+terminal            TILDE;
+terminal            CARET;
+terminal            VERTICALBAR;
+terminal            QUESTIONMAR;
+terminal            HASH;
+terminal            DO;
+terminal            CONST;
+terminal            FLOAT;
+
+
+/* Nonterminals */
+
+non terminal Program      program;
+non terminal LinkedList       declList;
+non terminal Decl           decl;
+non terminal LinkedList       varDeclList;
+non terminal VarDecl      varDecl;
+non terminal FuncDef       funcDef;
+non terminal FormalsList  formals;
+non terminal FuncBody       funcBody;
+non terminal LinkedList       stmtList;
+non terminal Stmt         stmt;
+non terminal Expr          exp;
+non terminal Expr          term;
+non terminal Type           type;
+non terminal Expr          loc;
+non terminal ID           id;
+non terminal Stmt         assignStmt;
+
+// added
+non terminal FormalDecl formalDecl;
+non terminal LinkedList formalsList;
+
+non terminal BinaryExpr     binaryExpr;
+
+
+precedence left PLUS, MINUS;
+
+start with program;
+
+/*
+ * grammar with actions
+ */
+
+program ::= declList: d {: RESULT = new Program(new DeclList(d)); :}
+          ;
+
+declList ::= declList: dl decl: d {: dl.addLast(d); RESULT = dl; :}
+           | /* epsilon */ {: RESULT = new LinkedList(); :}
+           ;
+
+decl ::= varDecl: v {: RESULT = v; :}
+       | funcDef: f {: RESULT = f; :}
+       ;
+
+/* http://www2.cs.tum.edu/projects/cup/
+LALR
+*/
+varDecl ::= type: t id: i SEMICOLON
+             {: RESULT = new VarDecl(t, i); :}
+          | type: t id: i LSQBRACKET INTLITERAL: il RSQBRACKET SEMICOLON
+            {: RESULT = new VarDecl(t, i, new IntLiteral(il)); :}
+          ;
+
+funcDef ::= type: t id: i formals: f funcBody: body {: RESULT = new FuncDef(t, 0, i, f, body); :}
+         ;
+
+formals ::= LPAREN formalsList: fl RPAREN {: RESULT = new FormalsList(fl); :}
+        ;
+
+formalsList ::= formalDecl: fmd  {:
+                LinkedList<FormalDecl> list = new LinkedList<FormalDecl>();
+                list.addLast(fmd);
+                RESULT = list;
+              :}
+          | formalDecl: fmd COMMA formalsList: fml {: fml.addFirst(fmd); RESULT = fml; :}
+          |  /* epsilon */ {: RESULT = new LinkedList(); :}
+          ;
+
+formalDecl ::= type: t id: i {: RESULT = new FormalDecl(t, i); :}
+          ;
+
+funcBody ::= LCURLY varDeclList: v stmtList: s RCURLY
+              {: RESULT = new FuncBody(new DeclList(v), new StmtList(s)); :}
+         ;
+
+varDeclList ::= varDeclList: l varDecl: var {: l.addLast(var); RESULT = l; :}
+              | /* epsilon */ {: RESULT = new LinkedList(); :}
+              ;
+
+stmtList ::= stmtList: l stmt: s {: l.addLast(s); RESULT = l; :}
+          |  /* epsilon */ {: RESULT = new LinkedList(); :}
+          ;
+
+stmt ::= assignStmt:a SEMICOLON {: RESULT = a; :}
+      ;
+
+assignStmt ::= loc: l ASSIGN exp: e {: RESULT = new AssignStmt(l, e); :}
+         ;
+
+exp ::= binaryExpr: b {: RESULT = b; :}
+      | term: t {: RESULT = t; :}
+      ;
+
+binaryExpr ::= exp: e1 PLUS exp: e2 {: RESULT = new PlusExpr(e1, e2); :}
+        | exp: e1 MINUS exp: e2 {: RESULT = new MinusExpr(e1, e2); :}
+        ;
+
+term ::= loc: l {: RESULT = l; :}
+       | INTLITERAL: i {: RESULT = new IntLiteral(i); :}
+       ;
+
+type ::= INT {: RESULT = new IntType(); :}
+       | VOID {: RESULT = new VoidType(); :}
+       ;
+
+loc ::= id: i {: RESULT = i; :}
+      ;
+
+id ::= ID: i {: RESULT = new ID(i); :}
+     ;

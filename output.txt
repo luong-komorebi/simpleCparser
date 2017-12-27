@@ -1,0 +1,28 @@
+Program
+  DeclList
+    FuncDef
+      Type (VOID)
+      ID (main)
+      LPAREN
+      FormalsList
+        FormalDecl
+          Type (INT)
+          ID (a)
+        COMMA
+        FormalDecl
+          Type (INT)
+          ID (b)
+      RPAREN
+      FuncBody
+        LCURLY
+          DeclList
+            VarDecl
+              Type (INT)
+              ID (a)
+              SEMICOLON
+            VarDecl
+              Type (INT)
+              ID (b)
+              SEMICOLON
+          StmtList
+        RCURLY
