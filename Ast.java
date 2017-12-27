@@ -316,6 +316,27 @@ class VoidType extends Type {
     }
 }
 
+class CharType extends Type {
+    public CharType() {
+    }
+
+    public String name() {
+        return "CHAR";
+    }
+}
+
+class StructType extends Type {
+  public StructType(ID id) {
+    myStructName = id;
+  }
+
+  public String name() {
+    return "STRUCT " + myStructName.getName();
+  }
+
+  private ID myStructName;
+}
+
 // **********************************************************************
 // Expr
 // **********************************************************************
@@ -339,12 +360,111 @@ class IntLiteral extends Term {
         }
     }
 
-    public void print(PrintWriter pw, int indent) {
-      printTerm(pw, indent, INTLITERAL, myIntVal);
+    public void print(PrintWriter pw, int indentLevel) {
+      printTerm(pw, indentLevel, INTLITERAL, myIntVal);
     }
 
     private String myIntVal;
     private Integer convertedInt;
+}
+
+class RealLiteral extends Term {
+    public RealLiteral(String realVal) {
+        myRealVal = realVal;
+
+        try {
+          convertedReal = new Double(myRealVal);
+        } catch (Exception e) {
+          convertedReal = null;
+        }
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+      printTerm(pw, indentLevel, REALLITERAL, myRealVal);
+    }
+
+    private String myRealVal;
+    private Double convertedReal;
+}
+
+class StringLiteral extends Term {
+    public StringLiteral(String stringVal) {
+        myStringVal = stringVal;
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+      printTerm(pw, indentLevel, STRINGLITERAL, myStringVal);
+    }
+
+    private String myStringVal;
+}
+
+class CharLiteral extends Term {
+    public CharLiteral(String charVal) {
+        myCharVal = charVal;
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+      printTerm(pw, indentLevel, CHARLITERAL, myCharVal);
+    }
+
+    private String myCharVal;
+}
+
+class True extends Term {
+  public True() {
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printTerm(pw, indentLevel, TRUE);
+  }
+}
+
+class False extends Term {
+  public False() {
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printTerm(pw, indentLevel, FALSE);
+  }
+}
+
+class Null extends Term {
+  public Null() {
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printTerm(pw, indentLevel, NULL);
+  }
+}
+
+class Sizeof extends Term {
+  public Sizeof(ID id) {
+    myId = id;
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printTerm(pw, indentLevel, SIZEOF);
+    printTerm(pw, indentLevel + 1, LPAREN);
+    myId.print(pw, indentLevel + 1);
+    printTerm(pw, indentLevel + 1, RPAREN);
+  }
+
+  private ID myId;
+}
+
+class BoundedExpr extends Term {
+  public BoundedExpr(Expr e) {
+    myExpr = e;
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printTerm(pw, indentLevel, LPAREN);
+    myExpr.print(pw, indentLevel);
+    printTerm(pw, indentLevel, RPAREN);
+  }
+
+  private Expr myExpr;
 }
 
 class CallExpr extends Term {
@@ -419,6 +539,50 @@ class AccessLoc extends Loc {
   private ID myId;
 }
 
+abstract class UnaryExpr extends Expr {
+  public UnaryExpr(Expr e) {
+    myExp = e;
+  }
+
+  protected Expr myExp;
+}
+
+class MinusUnaryExpr extends UnaryExpr {
+  public MinusUnaryExpr(Expr e) {
+    super(e);
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printNonTerm(pw, indentLevel);
+    printTerm(pw, indentLevel + 1, MINUS);
+    myExp.print(pw, indentLevel + 1);
+  }
+}
+
+class AddrOfExpr extends UnaryExpr {
+  public AddrOfExpr(Expr e) {
+    super(e);
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printNonTerm(pw, indentLevel);
+    printTerm(pw, indentLevel + 1, AMPERSAND);
+    myExp.print(pw, indentLevel + 1);
+  }
+}
+
+class NotExpr extends UnaryExpr {
+  public NotExpr(Expr e) {
+    super(e);
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printNonTerm(pw, indentLevel);
+    printTerm(pw, indentLevel + 1, BANG);
+    myExp.print(pw, indentLevel + 1);
+  }
+}
+
 abstract class BinaryExpr extends Expr {
     public BinaryExpr(Expr exp1, Expr exp2) {
         myExp1 = exp1;
@@ -435,7 +599,10 @@ class PlusExpr extends BinaryExpr {
     }
 
     public void print(PrintWriter pw, int indentLevel) {
-
+      printNonTerm(pw, indentLevel);
+      myExp1.print(pw, indentLevel + 1);
+      printTerm(pw, indentLevel + 1, PLUS);
+      myExp2.print(pw, indentLevel + 1);
     }
 }
 
@@ -445,7 +612,10 @@ class MinusExpr extends BinaryExpr {
     }
 
     public void print(PrintWriter pw, int indentLevel) {
-
+      printNonTerm(pw, indentLevel);
+      myExp1.print(pw, indentLevel + 1);
+      printTerm(pw, indentLevel + 1, MINUS);
+      myExp2.print(pw, indentLevel + 1);
     }
 }
 
@@ -468,6 +638,7 @@ class AssignStmt extends Stmt {
         myLhs.print(pw, indentLevel + 1);
         printTerm(pw, indentLevel + 1, ASSIGN);
         myExp.print(pw, indentLevel + 1);
+        printTerm(pw, indentLevel, SEMICOLON);
     }
 
     private Expr myLhs;

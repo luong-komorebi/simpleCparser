@@ -68,6 +68,7 @@ terminal            SUB_ASSIGN;
 terminal            MUL_ASSIGN;
 terminal            DIV_ASSIGN;
 terminal            PERCENT;
+terminal            COLON;
 
 terminal            EXTERN;
 terminal            COMMENTBLOCK;
@@ -139,6 +140,7 @@ non terminal ArrayExpr        arrayExpr;
 non terminal LinkedList       actualList;
 non terminal CallExpr         callExpr;
 non terminal CallStmt         callStmt;
+non terminal UnaryExpr        unaryExpr;
 
 precedence left PLUS, MINUS;
 
@@ -211,6 +213,12 @@ callStmt ::= callExpr: c SEMICOLON {: RESULT = new CallStmt(c); :}
 
 exp ::= binaryExpr: b {: RESULT = b; :}
       | term: t {: RESULT = t; :}
+      | unaryExpr: u {: RESULT = u; :}
+      ;
+
+unaryExpr ::= AMPERSAND exp: e {: RESULT = new AddrOfExpr(e); :}
+      | BANG exp: e {: RESULT = new NotExpr(e); :}
+      | MINUS exp: e {: RESULT = new MinusUnaryExpr(e); :}
       ;
 
 binaryExpr ::= exp: e1 PLUS exp: e2 {: RESULT = new PlusExpr(e1, e2); :}
@@ -219,6 +227,15 @@ binaryExpr ::= exp: e1 PLUS exp: e2 {: RESULT = new PlusExpr(e1, e2); :}
 
 term ::= loc: l {: RESULT = l; :}
        | INTLITERAL: i {: RESULT = new IntLiteral(i); :}
+       | REALLITERAL: r {: RESULT = new RealLiteral(r); :}
+       | STRINGLITERAL: s {: RESULT = new StringLiteral(s); :}
+       | CHARLITERAL: c {: RESULT = new CharLiteral(c); :}
+       | TRUE {: RESULT = new True(); :}
+       | FALSE {: RESULT = new False(); :}
+       | NULL {: RESULT = new Null(); :}
+       | callExpr: c {: RESULT = c; :}
+       | SIZEOF LPAREN id: i RPAREN {: RESULT = new Sizeof(i); :}
+       | LPAREN exp: e RPAREN {: RESULT = new BoundedExpr(e); :}
        ;
 
 callExpr ::=  id: i LPAREN actualList: a RPAREN {: RESULT = new CallExpr(i, new ActualList(a)); :}
@@ -233,6 +250,10 @@ actualList ::= exp: e {: LinkedList<Expr> list = new LinkedList<Expr>();
 
 type ::= INT {: RESULT = new IntType(); :}
        | VOID {: RESULT = new VoidType(); :}
+       | BOOL {: RESULT = new BoolType(); :}
+       | DOUBLE {: RESULT = new DoubleType(); :}
+       | CHAR {: RESULT = new CharType(); :}
+       | STRUCT id: i {: RESULT = new StructType(i); :}
        ;
 
 loc ::= id: i {: RESULT = i; :}
