@@ -1,4 +1,14 @@
-void main(int a, int b) {
+void swap(int a, int b);
+
+struct aloha {
 	int a;
 	int b;
+	bool c;
+};
+
+void main(int a, int b, bool c) {
+	int a;
+	int b;
+	bool f;
+	double g;
 }

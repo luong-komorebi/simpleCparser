@@ -82,11 +82,24 @@ class DeclList extends AST {
     protected LinkedList<?> myDecls;
 }
 
-class StructDeclList extends DeclList {
-    public StructDeclList(LinkedList<?> S) {
-        super(S);
-    }
+class VarDeclList extends AST {
+  public VarDeclList(LinkedList<?> D) {
+      myVarDecls = D;
+  }
 
+  public void print(PrintWriter pw, int indentLevel) {
+      Iterator<?> it = myVarDecls.iterator();
+      try {
+          printNonTerm(pw, indentLevel);
+          while (it.hasNext()) {
+              ((VarDecl)it.next()).print(pw, indentLevel + 1);
+          }
+      } catch (Exception e) {
+        e.printStackTrace(System.err);
+      }
+  }
+
+  protected LinkedList<?> myVarDecls;
 }
 
 class FormalsList extends AST {
@@ -113,8 +126,8 @@ class FormalsList extends AST {
 }
 
 class FuncBody extends AST {
-    public FuncBody(DeclList declList, StmtList stmtList) {
-        myDeclList = declList;
+    public FuncBody(VarDeclList varDeclList, StmtList stmtList) {
+        myVarDeclList = varDeclList;
         myStmtList = stmtList;
     }
     // added
@@ -122,13 +135,13 @@ class FuncBody extends AST {
         printNonTerm(pw, indentLevel);
         printTerm(pw, indentLevel + 1, LCURLY);
 
-        myDeclList.print(pw, indentLevel + 2);
+        myVarDeclList.print(pw, indentLevel + 2);
         myStmtList.print(pw, indentLevel + 2);
 
         printTerm(pw, indentLevel + 1, RCURLY);
     }
 
-    private DeclList myDeclList;
+    private VarDeclList myVarDeclList;
     private StmtList myStmtList;
 }
 
@@ -154,8 +167,7 @@ class StmtList extends AST {
 }
 
 abstract class Decl extends AST {
-    // added
-    //public abstract void print(PrintWriter pw, int indentLevel);
+
 }
 
 class VarDecl extends Decl {
@@ -217,6 +229,29 @@ class FuncDef extends Decl {
     private FuncBody    myBody;
 }
 
+class FuncDecl extends Decl {
+    public FuncDecl(Type type, ID id, FormalsList formalsList) {
+        myType = type;
+        myId = id;
+        myFormalsList = formalsList;
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        printNonTerm(pw, indentLevel);
+
+        myType.print(pw, indentLevel);
+        myId.print(pw, indentLevel);
+        printTerm(pw, indentLevel, LPAREN);
+        myFormalsList.print(pw, indentLevel + 1);
+        printTerm(pw, indentLevel, RPAREN);
+        printTerm(pw, indentLevel, SEMICOLON);
+    }
+
+    private Type myType;
+    private ID myId;
+    private FormalsList myFormalsList;
+}
+
 class FormalDecl extends Decl {
     public FormalDecl(Type type, ID id) {
         myType = type;
@@ -232,6 +267,27 @@ class FormalDecl extends Decl {
 
     private Type myType;
     private ID   myId;
+}
+
+// added
+class StructDecl extends Decl {
+    public StructDecl(ID id, VarDeclList varDeclList) {
+        myId = id;
+        myvarDeclList = varDeclList;
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        printNonTerm(pw, indentLevel);
+        printTerm(pw, indentLevel, STRUCT);
+        myId.print(pw, indentLevel);
+        printTerm(pw, indentLevel, LCURLY);
+        myvarDeclList.print(pw, indentLevel + 1);
+        printTerm(pw, indentLevel, RCURLY);
+        printTerm(pw, indentLevel, SEMICOLON);
+    }
+
+    private ID myId;
+    private VarDeclList myvarDeclList;
 }
 
 // **********************************************************************
@@ -327,6 +383,13 @@ abstract class BinaryExpr extends Expr {
         myExp2 = exp2;
     }
 
+    public void print(PrintWriter pw, int indentLevel, int token) {
+        printNonTerm(pw, indentLevel);
+        myExp1.print(pw, indentLevel + 1);
+        printTerm(pw, indentLevel + 1, token);
+        myExp2.print(pw, indentLevel + 1);
+    }
+
     protected Expr myExp1;
     protected Expr myExp2;
 }
@@ -337,7 +400,7 @@ class PlusExpr extends BinaryExpr {
     }
 
     public void print(PrintWriter pw, int indentLevel) {
-
+        print(pw, indentLevel, PLUS);
     }
 }
 
@@ -347,9 +410,120 @@ class MinusExpr extends BinaryExpr {
     }
 
     public void print(PrintWriter pw, int indentLevel) {
-
+        print(pw, indentLevel, MINUS);
     }
 }
+
+class TimesExpr extends BinaryExpr {
+    public TimesExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, TIMES);
+    }
+}
+
+class DivideExpr extends BinaryExpr {
+    public DivideExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, DIVIDE);
+    }
+}
+
+class PercentExpr extends BinaryExpr {
+    public PercentExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, PERCENT);
+    }
+}
+
+class AndExpr extends BinaryExpr {
+    public AndExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, AMPERSAND);
+    }
+}
+
+class OrExpr extends BinaryExpr {
+    public OrExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, VERTICALBAR);
+    }
+}
+
+class EqualsExpr extends BinaryExpr {
+    public EqualsExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, EQUALS);
+    }
+}
+
+class NotEqualsExpr extends BinaryExpr {
+    public NotEqualsExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, NE_OP);
+    }
+}
+
+class LessExpr extends BinaryExpr {
+    public LessExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, LESS);
+    }
+}
+
+class GreaterExpr extends BinaryExpr {
+    public GreaterExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, GREATER);
+    }
+}
+
+class LessEqExpr extends BinaryExpr {
+    public LessEqExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, LE_OP);
+    }
+}
+
+class GreaterEqExpr extends BinaryExpr {
+    public GreaterEqExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, GE_OP);
+    }
+}
+
 
 // **********************************************************************
 // Stmt

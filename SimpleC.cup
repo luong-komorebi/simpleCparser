@@ -68,6 +68,7 @@ terminal            SUB_ASSIGN;
 terminal            MUL_ASSIGN;
 terminal            DIV_ASSIGN;
 terminal            PERCENT;
+terminal            COLON;
 
 terminal            EXTERN;
 terminal            COMMENTBLOCK;
@@ -120,7 +121,9 @@ non terminal LinkedList       declList;
 non terminal Decl           decl;
 non terminal LinkedList       varDeclList;
 non terminal VarDecl      varDecl;
+non terminal FuncDecl       funcDecl;
 non terminal FuncDef       funcDef;
+non terminal StructDecl     structDecl;
 non terminal FormalsList  formals;
 non terminal FuncBody       funcBody;
 non terminal LinkedList       stmtList;
@@ -156,6 +159,8 @@ declList ::= declList: dl decl: d {: dl.addLast(d); RESULT = dl; :}
 
 decl ::= varDecl: v {: RESULT = v; :}
        | funcDef: f {: RESULT = f; :}
+       | funcDecl: f {: RESULT = f; :}
+       | structDecl: s {: RESULT = s; :}
        ;
 
 /* http://www2.cs.tum.edu/projects/cup/
@@ -166,6 +171,9 @@ varDecl ::= type: t id: i SEMICOLON
           | type: t id: i LSQBRACKET INTLITERAL: il RSQBRACKET SEMICOLON
             {: RESULT = new VarDecl(t, i, new IntLiteral(il)); :}
           ;
+
+funcDecl ::= type: t id: i formals: f SEMICOLON {: RESULT = new FuncDecl(t, i, f); :}
+            ;
 
 funcDef ::= type: t id: i formals: f funcBody: body {: RESULT = new FuncDef(t, 0, i, f, body); :}
          ;
@@ -185,8 +193,11 @@ formalsList ::= formalDecl: fmd  {:
 formalDecl ::= type: t id: i {: RESULT = new FormalDecl(t, i); :}
           ;
 
+structDecl ::= STRUCT id: i LCURLY varDeclList: v RCURLY SEMICOLON
+            {: RESULT = new StructDecl(i, new VarDeclList(v)); :}
+            ;
 funcBody ::= LCURLY varDeclList: v stmtList: s RCURLY
-              {: RESULT = new FuncBody(new DeclList(v), new StmtList(s)); :}
+              {: RESULT = new FuncBody(new VarDeclList(v), new StmtList(s)); :}
          ;
 
 varDeclList ::= varDeclList: l varDecl: var {: l.addLast(var); RESULT = l; :}
@@ -209,6 +220,17 @@ exp ::= binaryExpr: b {: RESULT = b; :}
 
 binaryExpr ::= exp: e1 PLUS exp: e2 {: RESULT = new PlusExpr(e1, e2); :}
         | exp: e1 MINUS exp: e2 {: RESULT = new MinusExpr(e1, e2); :}
+        | exp: e1 TIMES exp: e2 {: RESULT = new TimesExpr(e1, e2); :}
+        | exp: e1 DIVIDE exp: e2 {: RESULT = new DivideExpr(e1, e2); :}
+        | exp: e1 PERCENT exp: e2 {: RESULT = new PercentExpr(e1, e2); :}
+        | exp: e1 AMPERSAND exp: e2 {: RESULT = new AndExpr(e1, e2); :}
+        | exp: e1 VERTICALBAR exp: e2 {: RESULT = new OrExpr(e1, e2); :}
+        | exp: e1 EQUALS exp: e2 {: RESULT = new EqualsExpr(e1, e2); :}
+        | exp: e1 NE_OP exp: e2 {: RESULT = new NotEqualsExpr(e1, e2); :}
+        | exp: e1 LESS exp: e2 {: RESULT = new LessExpr(e1, e2); :}
+        | exp: e1 GREATER exp: e2 {: RESULT = new GreaterExpr(e1, e2); :}
+        | exp: e1 LE_OP exp: e2 {: RESULT = new LessEqExpr(e1, e2); :}
+        | exp: e1 GE_OP exp: e2 {: RESULT = new GreaterEqExpr(e1, e2); :}
         ;
 
 term ::= loc: l {: RESULT = l; :}
@@ -217,6 +239,8 @@ term ::= loc: l {: RESULT = l; :}
 
 type ::= INT {: RESULT = new IntType(); :}
        | VOID {: RESULT = new VoidType(); :}
+       | BOOL {: RESULT = new BoolType(); :}
+       | DOUBLE {: RESULT = new DoubleType(); :}
        ;
 
 loc ::= id: i {: RESULT = i; :}
