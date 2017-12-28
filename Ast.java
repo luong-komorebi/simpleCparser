@@ -174,10 +174,10 @@ class ActualList extends AST {
       try {
           printNonTerm(pw, indentLevel);
           while (it.hasNext()) {
-              ((Expr)it.next()).print(pw, indentLevel + 2);
+              ((Expr)it.next()).print(pw, indentLevel + 1);
 
               if (it.hasNext())
-                printTerm(pw, indentLevel + 2, COMMA);
+                printTerm(pw, indentLevel + 1, COMMA);
           }
       } catch (Exception e) {
         e.printStackTrace(System.err);
@@ -785,6 +785,7 @@ class AssignStmt extends Stmt {
     public AssignStmt(Expr lhs, Expr exp) {
         myLhs = lhs;
         myExp = exp;
+        hasSemi = true;
     }
 
     public void print(PrintWriter pw, int indentLevel) {
@@ -792,11 +793,17 @@ class AssignStmt extends Stmt {
         myLhs.print(pw, indentLevel + 1);
         printTerm(pw, indentLevel + 1, ASSIGN);
         myExp.print(pw, indentLevel + 1);
-        printTerm(pw, indentLevel + 1, SEMICOLON);
+        if (hasSemi)
+          printTerm(pw, indentLevel, SEMICOLON);
+    }
+
+    public void toggleSemi() {
+      hasSemi = !hasSemi;
     }
 
     private Expr myLhs;
     private Expr myExp;
+    private boolean hasSemi;
 }
 
 class CallStmt extends Stmt {
@@ -893,8 +900,10 @@ class ForStmt extends Stmt {
       printTerm(p, indent+1, SEMICOLON);
     myCond.print(p, indent+1);
     printTerm(p, indent+1, SEMICOLON);
-    if (myIncr != null)
+    if (myIncr != null) {
+      myIncr.toggleSemi();
       myIncr.print(p, indent+1);
+    }
     printTerm(p, indent+1, RPAREN);
     printTerm(p, indent+1, LCURLY);
     myVarDeclList.print(p, indent+1);

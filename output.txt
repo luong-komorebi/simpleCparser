@@ -64,7 +64,7 @@ Program
                             LSQBRACKET
                             ID (a)
                             RSQBRACKET
-                        SEMICOLON
+                    SEMICOLON
                     AssignStmt
                         ArrayExpr
                             ID (list)
@@ -77,7 +77,7 @@ Program
                             LSQBRACKET
                             ID (b)
                             RSQBRACKET
-                        SEMICOLON
+                    SEMICOLON
                     AssignStmt
                         ArrayExpr
                             ID (list)
@@ -86,7 +86,7 @@ Program
                             RSQBRACKET
                         ASSIGN
                         ID (temp)
-                        SEMICOLON
+                    SEMICOLON
                     ReturnStmt
                         RETURN
                         ID (temp)
@@ -124,28 +124,28 @@ Program
                             ID (start)
                             PLUS
                             INTLITERAL (1)
-                        SEMICOLON
+                    SEMICOLON
                     AssignStmt
                         ID (upper)
                         ASSIGN
                         ID (end)
-                        SEMICOLON
+                    SEMICOLON
                     CallStmt
                         CallExpr
                             ID (swap)
                             LPAREN
                             ActualList
-                                    ID (start)
-                                    COMMA
-                                    DivideExpr
-                                        LPAREN
-                                        PlusExpr
-                                            ID (start)
-                                            PLUS
-                                            ID (end)
-                                        RPAREN
-                                        DIVIDE
-                                        INTLITERAL (2)
+                                ID (start)
+                                COMMA
+                                DivideExpr
+                                    LPAREN
+                                    PlusExpr
+                                        ID (start)
+                                        PLUS
+                                        ID (end)
+                                    RPAREN
+                                    DIVIDE
+                                    INTLITERAL (2)
                             RPAREN
                         SEMICOLON
                     WhileStmt
@@ -185,7 +185,7 @@ Program
                                             ID (lower)
                                             PLUS
                                             INTLITERAL (1)
-                                        SEMICOLON
+                                    SEMICOLON
                                 RCURLY
                             WhileStmt
                                 WHILE
@@ -213,7 +213,7 @@ Program
                                             ID (upper)
                                             MINUS
                                             INTLITERAL (1)
-                                        SEMICOLON
+                                    SEMICOLON
                                 RCURLY
                             IfElseStmt
                                 IF
@@ -231,9 +231,9 @@ Program
                                             ID (swap)
                                             LPAREN
                                             ActualList
-                                                    ID (lower)
-                                                    COMMA
-                                                    ID (upper)
+                                                ID (lower)
+                                                COMMA
+                                                ID (upper)
                                             RPAREN
                                         SEMICOLON
                                     AssignStmt
@@ -243,7 +243,7 @@ Program
                                             ID (lower)
                                             PLUS
                                             INTLITERAL (1)
-                                        SEMICOLON
+                                    SEMICOLON
                                     AssignStmt
                                         ID (upper)
                                         ASSIGN
@@ -251,7 +251,7 @@ Program
                                             ID (upper)
                                             PLUS
                                             INTLITERAL (1)
-                                        SEMICOLON
+                                    SEMICOLON
                                 RCURLY
                                 ELSE
                                 LCURLY
@@ -264,7 +264,7 @@ Program
                                             ID (lower)
                                             PLUS
                                             INTLITERAL (1)
-                                        SEMICOLON
+                                    SEMICOLON
                                 RCURLY
                         RCURLY
                     CallStmt
@@ -272,9 +272,9 @@ Program
                             ID (swap)
                             LPAREN
                             ActualList
-                                    ID (upper)
-                                    COMMA
-                                    ID (start)
+                                ID (upper)
+                                COMMA
+                                ID (start)
                             RPAREN
                         SEMICOLON
                     IfStmt
@@ -296,12 +296,12 @@ Program
                                     ID (quickSort)
                                     LPAREN
                                     ActualList
-                                            ID (start)
-                                            COMMA
-                                            MinusExpr
-                                                ID (upper)
-                                                MINUS
-                                                INTLITERAL (1)
+                                        ID (start)
+                                        COMMA
+                                        MinusExpr
+                                            ID (upper)
+                                            MINUS
+                                            INTLITERAL (1)
                                     RPAREN
                                 SEMICOLON
                         RCURLY
@@ -324,12 +324,12 @@ Program
                                     ID (quickSort)
                                     LPAREN
                                     ActualList
-                                            PlusExpr
-                                                ID (upper)
-                                                PLUS
-                                                INTLITERAL (1)
-                                            COMMA
-                                            ID (end)
+                                        PlusExpr
+                                            ID (upper)
+                                            PLUS
+                                            INTLITERAL (1)
+                                        COMMA
+                                        ID (end)
                                     RPAREN
                                 SEMICOLON
                         RCURLY
@@ -356,7 +356,7 @@ Program
                         ID (length)
                         ASSIGN
                         INTLITERAL (500)
-                        SEMICOLON
+                    SEMICOLON
                     IfStmt
                         IF
                         LPAREN
@@ -376,7 +376,7 @@ Program
                                 ID (max)
                                 ASSIGN
                                 INTLITERAL (0)
-                                SEMICOLON
+                            SEMICOLON
                             ForStmt
                                 FOR
                                 LPAREN
@@ -384,7 +384,7 @@ Program
                                     ID (i)
                                     ASSIGN
                                     INTLITERAL (1)
-                                    SEMICOLON
+                                SEMICOLON
                                 LessExpr
                                     ID (i)
                                     LESS
@@ -397,7 +397,6 @@ Program
                                         ID (i)
                                         PLUS
                                         INTLITERAL (1)
-                                    SEMICOLON
                                 RPAREN
                                 LCURLY
                                 VarDeclList
@@ -425,7 +424,7 @@ Program
                                                 ID (max)
                                                 ASSIGN
                                                 ID (i)
-                                                SEMICOLON
+                                            SEMICOLON
                                         RCURLY
                                 RCURLY
                             CallStmt
@@ -433,12 +432,12 @@ Program
                                     ID (swap)
                                     LPAREN
                                     ActualList
-                                            MinusExpr
-                                                ID (length)
-                                                MINUS
-                                                INTLITERAL (1)
-                                            COMMA
-                                            ID (max)
+                                        MinusExpr
+                                            ID (length)
+                                            MINUS
+                                            INTLITERAL (1)
+                                        COMMA
+                                        ID (max)
                                     RPAREN
                                 SEMICOLON
                             CallStmt
@@ -446,12 +445,12 @@ Program
                                     ID (quickSort)
                                     LPAREN
                                     ActualList
-                                            INTLITERAL (0)
-                                            COMMA
-                                            MinusExpr
-                                                ID (length)
-                                                MINUS
-                                                INTLITERAL (2)
+                                        INTLITERAL (0)
+                                        COMMA
+                                        MinusExpr
+                                            ID (length)
+                                            MINUS
+                                            INTLITERAL (2)
                                     RPAREN
                                 SEMICOLON
                         RCURLY

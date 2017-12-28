@@ -160,8 +160,8 @@ CharLiteral = L? '(\\[^x\r\n] | [^\'\\\r\n] | \\x[a-fA-F0-9]+)+'
 
   {CharLiteral} { return symbol(CHARLITERAL, yytext()); }
 
-  {CommentLine}	{  }
-  {CommentBlock}	{  }
+  {CommentLine}	{ /* ignore */ }
+  {CommentBlock}	{ /* ignore */ }
 
 /*  {PreProcessor}	{ return symbol(PREPROCESSOR, yytext()); } */
 
