@@ -102,7 +102,7 @@ terminal            OR_ASSIGN;
 terminal            RIGHT_OP;
 terminal            LEFT_OP;
 terminal            INC_OP;
-terminal            DEC_OP;
+/*terminal            DEC_OP;*/
 terminal            PTR_OP;
 terminal            TILDE;
 terminal            CARET;
@@ -131,7 +131,6 @@ non terminal Term             term;
 non terminal Type             type;
 non terminal Loc              loc;
 non terminal ID               id;
-non terminal Stmt             assignStmt;
 
 non terminal FormalDecl       formalDecl;
 non terminal LinkedList       formalsList;
@@ -139,10 +138,29 @@ non terminal BinaryExpr       binaryExpr;
 non terminal ArrayExpr        arrayExpr;
 non terminal LinkedList       actualList;
 non terminal CallExpr         callExpr;
-non terminal CallStmt         callStmt;
 non terminal UnaryExpr        unaryExpr;
+non terminal FuncDecl         funcDecl;
+non terminal StructDecl       structDecl;
 
+non terminal AssignStmt   assignStmt;
+non terminal IfStmt		ifStmt;
+non terminal IfElseStmt		ifElseStmt;
+non terminal ForStmt		forStmt;
+non terminal AssignStmt		forInitStmt;
+non terminal WhileStmt		whileStmt;
+non terminal ReturnStmt		returnStmt;
+non terminal CallStmt   callStmt;
+
+precedence left VERTICALBAR;
+precedence left AMPERSAND;
+precedence nonassoc EQUALS, NE_OP;
+precedence nonassoc LESS, GREATER, LE_OP, GE_OP;
 precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE, PERCENT;
+
+precedence right SIZEOF;
+precedence right BANG;
+
 
 start with program;
 
@@ -159,6 +177,8 @@ declList ::= declList: dl decl: d {: dl.addLast(d); RESULT = dl; :}
 
 decl ::= varDecl: v {: RESULT = v; :}
        | funcDef: f {: RESULT = f; :}
+       | funcDecl: f {: RESULT = f; :}
+       | structDecl: s {: RESULT = s; :}
        ;
 
 /*
@@ -173,6 +193,9 @@ varDecl ::= type: t id: i SEMICOLON
 
 funcDef ::= type: t id: i formals: f funcBody: body {: RESULT = new FuncDef(t, 0, i, f, body); :}
          ;
+
+funcDecl ::= type: t id: i formals: f SEMICOLON {: RESULT = new FuncDecl(t, i, f); :}
+        ;
 
 formals ::= LPAREN formalsList: fl RPAREN {: RESULT = new FormalsList(fl); :}
         ;
@@ -189,6 +212,10 @@ formalsList ::= formalDecl: fmd  {:
 formalDecl ::= type: t id: i {: RESULT = new FormalDecl(t, i); :}
           ;
 
+structDecl ::= STRUCT id: i LCURLY varDeclList: v RCURLY SEMICOLON
+          {: RESULT = new StructDecl(i, new VarDeclList(v)); :}
+          ;
+
 funcBody ::= LCURLY varDeclList: v stmtList: s RCURLY
               {: RESULT = new FuncBody(new VarDeclList(v), new StmtList(s)); :}
          ;
@@ -202,14 +229,46 @@ stmtList ::= stmtList: l stmt: s {: l.addLast(s); RESULT = l; :}
           ;
 
 stmt ::= assignStmt: a SEMICOLON {: RESULT = a; :}
-        | callStmt: c {: RESULT = c; :}
+        | ifStmt: b {: RESULT = b; :}
+		    | ifElseStmt: c {: RESULT = c; :}
+		    | forStmt: d {: RESULT = d; :}
+		    | whileStmt: e {: RESULT = e; :}
+		    | returnStmt: f {: RESULT = f; :}
+		    | callStmt: g {: RESULT = g; :}
       ;
 
 assignStmt ::= loc: l ASSIGN exp: e {: RESULT = new AssignStmt(l, e); :}
+| loc: l ADD_ASSIGN exp: e {: RESULT = new AssignStmt(l, new PlusExpr(l, e)); :}
+| loc: l SUB_ASSIGN exp: e {: RESULT = new AssignStmt(l, new MinusExpr(l, e)); :}
+| loc: l MUL_ASSIGN exp: e {: RESULT = new AssignStmt(l, new TimesExpr(l, e)); :}
+| loc: l DIV_ASSIGN exp: e {: RESULT = new AssignStmt(l, new DivideExpr(l, e)); :}
          ;
 
 callStmt ::= callExpr: c SEMICOLON {: RESULT = new CallStmt(c); :}
       ;
+
+ifStmt ::= IF LPAREN exp: e RPAREN LCURLY varDeclList: l stmtList: stm RCURLY
+          {: RESULT = new IfStmt(e, new VarDeclList(l), new StmtList(stm)); :}
+      		;
+
+ifElseStmt ::= IF LPAREN exp: e RPAREN LCURLY varDeclList: l1 stmtList: stm1 RCURLY ELSE LCURLY varDeclList: l2 stmtList: stm2 RCURLY
+        {: RESULT = new IfElseStmt(e, new VarDeclList(l1), new StmtList(stm1), new VarDeclList(l2), new StmtList(stm2)); :}
+      		;
+
+forStmt ::= FOR LPAREN forInitStmt: init1 SEMICOLON exp: e SEMICOLON forInitStmt: init2 RPAREN LCURLY varDeclList: l stmtList: stm RCURLY {: RESULT = new ForStmt(init1, e, init2, new VarDeclList(l), new StmtList(stm)); :}
+      		;
+
+forInitStmt ::=  assignStmt: a {: RESULT = a; :}
+      			| /* epsilon */ {: RESULT = null; :}
+      		;
+
+whileStmt ::= WHILE LPAREN exp: e RPAREN LCURLY varDeclList: l stmtList: stm RCURLY
+        {: RESULT = new WhileStmt(e, new VarDeclList(l), new StmtList(stm)); :}
+      		;
+
+returnStmt ::= RETURN exp: e SEMICOLON  {: RESULT = new ReturnStmt(e); :}
+      		| RETURN SEMICOLON {: RESULT = new ReturnStmt(); :}
+      		;
 
 exp ::= binaryExpr: b {: RESULT = b; :}
       | term: t {: RESULT = t; :}
@@ -223,6 +282,17 @@ unaryExpr ::= AMPERSAND exp: e {: RESULT = new AddrOfExpr(e); :}
 
 binaryExpr ::= exp: e1 PLUS exp: e2 {: RESULT = new PlusExpr(e1, e2); :}
         | exp: e1 MINUS exp: e2 {: RESULT = new MinusExpr(e1, e2); :}
+        | exp: e1 TIMES exp: e2 {: RESULT = new TimesExpr(e1, e2); :}
+        | exp: e1 DIVIDE exp: e2 {: RESULT = new DivideExpr(e1, e2); :}
+        | exp: e1 PERCENT exp: e2 {: RESULT = new PercentExpr(e1, e2); :}
+        | exp: e1 AMPERSAND exp: e2 {: RESULT = new AndExpr(e1, e2); :}
+        | exp: e1 VERTICALBAR exp: e2 {: RESULT = new OrExpr(e1, e2); :}
+        | exp: e1 EQUALS exp: e2 {: RESULT = new EqualsExpr(e1, e2); :}
+        | exp: e1 NE_OP exp: e2 {: RESULT = new NotEqualsExpr(e1, e2); :}
+        | exp: e1 LESS exp: e2 {: RESULT = new LessExpr(e1, e2); :}
+        | exp: e1 GREATER exp: e2 {: RESULT = new GreaterExpr(e1, e2); :}
+        | exp: e1 LE_OP exp: e2 {: RESULT = new LessEqExpr(e1, e2); :}
+        | exp: e1 GE_OP exp: e2 {: RESULT = new GreaterEqExpr(e1, e2); :}
         ;
 
 term ::= loc: l {: RESULT = l; :}

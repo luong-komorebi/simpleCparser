@@ -37,14 +37,16 @@ WhiteSpace = {LineTerminator} | [ \v\t\f]
 Identifier = [_a-zA-Z][_a-zA-Z0-9]*
 
 Sign = [+-]?
+/* => May conflict with Minus Unary Law
+*/
 
 IntSuffices = [uU]? (l|L|ll|LL)?
 IntDec = 0 | [1-9][0-9]*
 IntHex = 0[xX][a-fA-F0-9]+
 IntOct = 0[0-7]+
-IntLiteral = {Sign} ({IntDec} | {IntHex} | {IntOct}) {IntSuffices}
+IntLiteral = ({IntDec} | {IntHex} | {IntOct}) {IntSuffices}
 
-RealLiteral = {Sign} (([0-9]+ \.? [0-9]*) | (\. [0-9]+)) ([eE]{Sign}[0-9]+)? [fFlL]?
+RealLiteral = (([0-9]+ \.? [0-9]*) | (\. [0-9]+)) ([eE]{Sign}[0-9]+)? [fFlL]?
 
 CommentLine = "//" [^\r\n]*
 CommentBlock = "/*" ~ "*/"
@@ -132,7 +134,7 @@ CharLiteral = L? '(\\[^x\r\n] | [^\'\\\r\n] | \\x[a-fA-F0-9]+)+'
   ">>"      { return symbol(RIGHT_OP); }
   "<<"      { return symbol(LEFT_OP); }
   "++"      { return symbol(INC_OP); }
-  "--"      { return symbol(DEC_OP); }
+/*  "--"      { return symbol(DEC_OP); } */
   "->"      { return symbol(PTR_OP); }
   "&&"      { return symbol(AND_OP); }
   "||"      { return symbol(OR_OP); }
@@ -158,8 +160,8 @@ CharLiteral = L? '(\\[^x\r\n] | [^\'\\\r\n] | \\x[a-fA-F0-9]+)+'
 
   {CharLiteral} { return symbol(CHARLITERAL, yytext()); }
 
-  {CommentLine}	{ return symbol(COMMENTLINE, yytext()); }
-  {CommentBlock}	{ return symbol(COMMENTBLOCK, yytext()); }
+  {CommentLine}	{  }
+  {CommentBlock}	{  }
 
 /*  {PreProcessor}	{ return symbol(PREPROCESSOR, yytext()); } */
 

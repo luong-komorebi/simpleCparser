@@ -1,144 +1,458 @@
 Program
-  DeclList
-    FuncDef
-      Type (VOID)
-      ID (main)
-      LPAREN
-      FormalsList
-        FormalDecl
-          Type (INT)
-          ID (a)
-        COMMA
-        FormalDecl
-          Type (INT)
-          ID (b)
-      RPAREN
-      FuncBody
-        LCURLY
-        VarDeclList
-          VarDecl
+    DeclList
+        VarDecl
             Type (INT)
-            ID (a)
+            ID (list)
+            LSQBRACKET
+            INTLITERAL (500)
+            RSQBRACKET
             SEMICOLON
-          VarDecl
-            Type (INT)
-            ID (b)
-            SEMICOLON
-          VarDecl
-            Type (STRUCT Book)
-            ID (c)
-            SEMICOLON
-          VarDecl
-            Type (BOOL)
-            ID (d)
-            SEMICOLON
-          VarDecl
+        FuncDecl
             Type (VOID)
-            ID (kd)
+            ID (swap)
+            LPAREN
+            FormalsList
+                FormalDecl
+                    Type (INT)
+                    ID (a)
+                COMMA
+                FormalDecl
+                    Type (INT)
+                    ID (b)
+            RPAREN
             SEMICOLON
-          VarDecl
-            Type (CHAR)
-            ID (c)
+        FuncDecl
+            Type (VOID)
+            ID (quickSort)
+            LPAREN
+            FormalsList
+                FormalDecl
+                    Type (INT)
+                    ID (start)
+                COMMA
+                FormalDecl
+                    Type (INT)
+                    ID (end)
+            RPAREN
             SEMICOLON
-          VarDecl
-            Type (DOUBLE)
-            ID (f)
-            SEMICOLON
-        StmtList
-          AssignStmt
-            ID (a)
-            ASSIGN
-            NULL
-          SEMICOLON
-          AssignStmt
-            ID (b)
-            ASSIGN
-            INTLITERAL (6)
-          SEMICOLON
-          AssignStmt
-            ID (c)
-            ASSIGN
-            REALLITERAL (0.54e-10)
-          SEMICOLON
-          AssignStmt
-            ID (d)
-            ASSIGN
-            CHARLITERAL ('\n')
-          SEMICOLON
-          AssignStmt
-            ID (e)
-            ASSIGN
-            STRINGLITERAL ("A string!")
-          SEMICOLON
-          AssignStmt
-            ID (f)
-            ASSIGN
-            TRUE
-          SEMICOLON
-          AssignStmt
-            ID (f)
-            ASSIGN
-            TRUE
-          SEMICOLON
-          AssignStmt
-            ID (g)
-            ASSIGN
-            FALSE
-          SEMICOLON
-          AssignStmt
-            ID (g)
-            ASSIGN
-            FALSE
-          SEMICOLON
-          AssignStmt
-            ID (h)
-            ASSIGN
-            NULL
-          SEMICOLON
-          AssignStmt
-            ID (a)
-            ASSIGN
-            MinusExpr
-              LPAREN
-              PlusExpr
-                ID (a)
-                PLUS
-                ID (b)
-              RPAREN
-              MINUS
-              INTLITERAL (6)
-          SEMICOLON
-          AssignStmt
-            ID (u)
-            ASSIGN
-            CallExpr
-              ID (swap)
-              LPAREN
-              ActualList
-                  INTLITERAL (7)
-                  COMMA
-                  ID (a)
-              RPAREN
-          SEMICOLON
-          AssignStmt
-            ID (lk)
-            ASSIGN
-            NotExpr
-              BANG
-              ID (a)
-          SEMICOLON
-          AssignStmt
-            ID (kf)
-            ASSIGN
-            MinusUnaryExpr
-              MINUS
-              ID (b)
-          SEMICOLON
-          AssignStmt
-            ID (ru)
-            ASSIGN
-            AddrOfExpr
-              AMPERSAND
-              ID (a)
-          SEMICOLON
-        RCURLY
+        FuncDef
+            Type (VOID)
+            ID (swap)
+            LPAREN
+            FormalsList
+                FormalDecl
+                    Type (INT)
+                    ID (a)
+                COMMA
+                FormalDecl
+                    Type (INT)
+                    ID (b)
+            RPAREN
+            FuncBody
+                LCURLY
+                VarDeclList
+                    VarDecl
+                        Type (INT)
+                        ID (temp)
+                        SEMICOLON
+                StmtList
+                    AssignStmt
+                        ID (temp)
+                        ASSIGN
+                        ArrayExpr
+                            ID (list)
+                            LSQBRACKET
+                            ID (a)
+                            RSQBRACKET
+                        SEMICOLON
+                    AssignStmt
+                        ArrayExpr
+                            ID (list)
+                            LSQBRACKET
+                            ID (a)
+                            RSQBRACKET
+                        ASSIGN
+                        ArrayExpr
+                            ID (list)
+                            LSQBRACKET
+                            ID (b)
+                            RSQBRACKET
+                        SEMICOLON
+                    AssignStmt
+                        ArrayExpr
+                            ID (list)
+                            LSQBRACKET
+                            ID (b)
+                            RSQBRACKET
+                        ASSIGN
+                        ID (temp)
+                        SEMICOLON
+                    ReturnStmt
+                        RETURN
+                        ID (temp)
+                        SEMICOLON
+                RCURLY
+        FuncDef
+            Type (VOID)
+            ID (quickSort)
+            LPAREN
+            FormalsList
+                FormalDecl
+                    Type (INT)
+                    ID (start)
+                COMMA
+                FormalDecl
+                    Type (INT)
+                    ID (end)
+            RPAREN
+            FuncBody
+                LCURLY
+                VarDeclList
+                    VarDecl
+                        Type (INT)
+                        ID (lower)
+                        SEMICOLON
+                    VarDecl
+                        Type (INT)
+                        ID (upper)
+                        SEMICOLON
+                StmtList
+                    AssignStmt
+                        ID (lower)
+                        ASSIGN
+                        PlusExpr
+                            ID (start)
+                            PLUS
+                            INTLITERAL (1)
+                        SEMICOLON
+                    AssignStmt
+                        ID (upper)
+                        ASSIGN
+                        ID (end)
+                        SEMICOLON
+                    CallStmt
+                        CallExpr
+                            ID (swap)
+                            LPAREN
+                            ActualList
+                                    ID (start)
+                                    COMMA
+                                    DivideExpr
+                                        LPAREN
+                                        PlusExpr
+                                            ID (start)
+                                            PLUS
+                                            ID (end)
+                                        RPAREN
+                                        DIVIDE
+                                        INTLITERAL (2)
+                            RPAREN
+                        SEMICOLON
+                    WhileStmt
+                        WHILE
+                        LPAREN
+                        LessEqExpr
+                            ID (lower)
+                            LE_OP
+                            ID (upper)
+                        RPAREN
+                        LCURLY
+                        VarDeclList
+                        StmtList
+                            WhileStmt
+                                WHILE
+                                LPAREN
+                                LessExpr
+                                    ArrayExpr
+                                        ID (list)
+                                        LSQBRACKET
+                                        ID (lower)
+                                        RSQBRACKET
+                                    LESS
+                                    ArrayExpr
+                                        ID (list)
+                                        LSQBRACKET
+                                        ID (start)
+                                        RSQBRACKET
+                                RPAREN
+                                LCURLY
+                                VarDeclList
+                                StmtList
+                                    AssignStmt
+                                        ID (lower)
+                                        ASSIGN
+                                        PlusExpr
+                                            ID (lower)
+                                            PLUS
+                                            INTLITERAL (1)
+                                        SEMICOLON
+                                RCURLY
+                            WhileStmt
+                                WHILE
+                                LPAREN
+                                LessExpr
+                                    ArrayExpr
+                                        ID (list)
+                                        LSQBRACKET
+                                        ID (start)
+                                        RSQBRACKET
+                                    LESS
+                                    ArrayExpr
+                                        ID (list)
+                                        LSQBRACKET
+                                        ID (upper)
+                                        RSQBRACKET
+                                RPAREN
+                                LCURLY
+                                VarDeclList
+                                StmtList
+                                    AssignStmt
+                                        ID (upper)
+                                        ASSIGN
+                                        MinusExpr
+                                            ID (upper)
+                                            MINUS
+                                            INTLITERAL (1)
+                                        SEMICOLON
+                                RCURLY
+                            IfElseStmt
+                                IF
+                                LPAREN
+                                LessExpr
+                                    ID (lower)
+                                    LESS
+                                    ID (upper)
+                                RPAREN
+                                LCURLY
+                                VarDeclList
+                                StmtList
+                                    CallStmt
+                                        CallExpr
+                                            ID (swap)
+                                            LPAREN
+                                            ActualList
+                                                    ID (lower)
+                                                    COMMA
+                                                    ID (upper)
+                                            RPAREN
+                                        SEMICOLON
+                                    AssignStmt
+                                        ID (lower)
+                                        ASSIGN
+                                        PlusExpr
+                                            ID (lower)
+                                            PLUS
+                                            INTLITERAL (1)
+                                        SEMICOLON
+                                    AssignStmt
+                                        ID (upper)
+                                        ASSIGN
+                                        PlusExpr
+                                            ID (upper)
+                                            PLUS
+                                            INTLITERAL (1)
+                                        SEMICOLON
+                                RCURLY
+                                ELSE
+                                LCURLY
+                                VarDeclList
+                                StmtList
+                                    AssignStmt
+                                        ID (lower)
+                                        ASSIGN
+                                        PlusExpr
+                                            ID (lower)
+                                            PLUS
+                                            INTLITERAL (1)
+                                        SEMICOLON
+                                RCURLY
+                        RCURLY
+                    CallStmt
+                        CallExpr
+                            ID (swap)
+                            LPAREN
+                            ActualList
+                                    ID (upper)
+                                    COMMA
+                                    ID (start)
+                            RPAREN
+                        SEMICOLON
+                    IfStmt
+                        IF
+                        LPAREN
+                        LessExpr
+                            ID (start)
+                            LESS
+                            MinusExpr
+                                ID (upper)
+                                MINUS
+                                INTLITERAL (1)
+                        RPAREN
+                        LCURLY
+                        VarDeclList
+                        StmtList
+                            CallStmt
+                                CallExpr
+                                    ID (quickSort)
+                                    LPAREN
+                                    ActualList
+                                            ID (start)
+                                            COMMA
+                                            MinusExpr
+                                                ID (upper)
+                                                MINUS
+                                                INTLITERAL (1)
+                                    RPAREN
+                                SEMICOLON
+                        RCURLY
+                    IfStmt
+                        IF
+                        LPAREN
+                        LessExpr
+                            PlusExpr
+                                ID (upper)
+                                PLUS
+                                INTLITERAL (1)
+                            LESS
+                            ID (end)
+                        RPAREN
+                        LCURLY
+                        VarDeclList
+                        StmtList
+                            CallStmt
+                                CallExpr
+                                    ID (quickSort)
+                                    LPAREN
+                                    ActualList
+                                            PlusExpr
+                                                ID (upper)
+                                                PLUS
+                                                INTLITERAL (1)
+                                            COMMA
+                                            ID (end)
+                                    RPAREN
+                                SEMICOLON
+                        RCURLY
+                RCURLY
+        FuncDef
+            Type (VOID)
+            ID (main)
+            LPAREN
+            FormalsList
+            RPAREN
+            FuncBody
+                LCURLY
+                VarDeclList
+                    VarDecl
+                        Type (INT)
+                        ID (length)
+                        SEMICOLON
+                    VarDecl
+                        Type (INT)
+                        ID (i)
+                        SEMICOLON
+                StmtList
+                    AssignStmt
+                        ID (length)
+                        ASSIGN
+                        INTLITERAL (500)
+                        SEMICOLON
+                    IfStmt
+                        IF
+                        LPAREN
+                        GreaterEqExpr
+                            ID (length)
+                            GE_OP
+                            INTLITERAL (2)
+                        RPAREN
+                        LCURLY
+                        VarDeclList
+                            VarDecl
+                                Type (INT)
+                                ID (max)
+                                SEMICOLON
+                        StmtList
+                            AssignStmt
+                                ID (max)
+                                ASSIGN
+                                INTLITERAL (0)
+                                SEMICOLON
+                            ForStmt
+                                FOR
+                                LPAREN
+                                AssignStmt
+                                    ID (i)
+                                    ASSIGN
+                                    INTLITERAL (1)
+                                    SEMICOLON
+                                LessExpr
+                                    ID (i)
+                                    LESS
+                                    ID (length)
+                                SEMICOLON
+                                AssignStmt
+                                    ID (i)
+                                    ASSIGN
+                                    PlusExpr
+                                        ID (i)
+                                        PLUS
+                                        INTLITERAL (1)
+                                    SEMICOLON
+                                RPAREN
+                                LCURLY
+                                VarDeclList
+                                StmtList
+                                    IfStmt
+                                        IF
+                                        LPAREN
+                                        LessExpr
+                                            ArrayExpr
+                                                ID (list)
+                                                LSQBRACKET
+                                                ID (max)
+                                                RSQBRACKET
+                                            LESS
+                                            ArrayExpr
+                                                ID (list)
+                                                LSQBRACKET
+                                                ID (i)
+                                                RSQBRACKET
+                                        RPAREN
+                                        LCURLY
+                                        VarDeclList
+                                        StmtList
+                                            AssignStmt
+                                                ID (max)
+                                                ASSIGN
+                                                ID (i)
+                                                SEMICOLON
+                                        RCURLY
+                                RCURLY
+                            CallStmt
+                                CallExpr
+                                    ID (swap)
+                                    LPAREN
+                                    ActualList
+                                            MinusExpr
+                                                ID (length)
+                                                MINUS
+                                                INTLITERAL (1)
+                                            COMMA
+                                            ID (max)
+                                    RPAREN
+                                SEMICOLON
+                            CallStmt
+                                CallExpr
+                                    ID (quickSort)
+                                    LPAREN
+                                    ActualList
+                                            INTLITERAL (0)
+                                            COMMA
+                                            MinusExpr
+                                                ID (length)
+                                                MINUS
+                                                INTLITERAL (2)
+                                    RPAREN
+                                SEMICOLON
+                        RCURLY
+                RCURLY

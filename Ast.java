@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 
 abstract class AST implements sym {
-  public static String indent = "  ";
+  public static String indent = "    ";
 
   public abstract void print(PrintWriter pw, int indentLevel);
 
@@ -236,7 +236,6 @@ class FuncDef extends Decl {
         printNonTerm(pw, indentLevel);
 
         myType.print(pw, indentLevel + 1);
-
         myId.print(pw, indentLevel + 1);
         printTerm(pw, indentLevel + 1, LPAREN);
         myFormalsList.print(pw, indentLevel + 1);
@@ -248,6 +247,29 @@ class FuncDef extends Decl {
     private ID          myId;
     private FormalsList myFormalsList;
     private FuncBody    myBody;
+}
+
+class FuncDecl extends Decl {
+    public FuncDecl(Type type, ID id, FormalsList formalsList) {
+        myType = type;
+        myId = id;
+        myFormalsList = formalsList;
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        printNonTerm(pw, indentLevel);
+
+        myType.print(pw, indentLevel + 1);
+        myId.print(pw, indentLevel + 1);
+        printTerm(pw, indentLevel + 1, LPAREN);
+        myFormalsList.print(pw, indentLevel + 1);
+        printTerm(pw, indentLevel + 1, RPAREN);
+        printTerm(pw, indentLevel + 1, SEMICOLON);
+    }
+
+    private Type myType;
+    private ID myId;
+    private FormalsList myFormalsList;
 }
 
 class FormalDecl extends Decl {
@@ -265,6 +287,27 @@ class FormalDecl extends Decl {
 
     private Type myType;
     private ID   myId;
+}
+
+class StructDecl extends Decl {
+    public StructDecl(ID id, VarDeclList varDeclList) {
+        myId = id;
+        myVarDeclList = varDeclList;
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        printNonTerm(pw, indentLevel);
+
+        printTerm(pw, indentLevel + 1, STRUCT);
+        myId.print(pw, indentLevel + 1);
+        printTerm(pw, indentLevel + 1, LCURLY);
+        myVarDeclList.print(pw, indentLevel + 1);
+        printTerm(pw, indentLevel + 1, RCURLY);
+        printTerm(pw, indentLevel + 1, SEMICOLON);
+    }
+
+    private ID myId;
+    private VarDeclList myVarDeclList;
 }
 
 // **********************************************************************
@@ -589,6 +632,13 @@ abstract class BinaryExpr extends Expr {
         myExp2 = exp2;
     }
 
+    public void print(PrintWriter pw, int indentLevel, int token) {
+        printNonTerm(pw, indentLevel);
+        myExp1.print(pw, indentLevel + 1);
+        printTerm(pw, indentLevel + 1, token);
+        myExp2.print(pw, indentLevel + 1);
+    }
+
     protected Expr myExp1;
     protected Expr myExp2;
 }
@@ -599,10 +649,7 @@ class PlusExpr extends BinaryExpr {
     }
 
     public void print(PrintWriter pw, int indentLevel) {
-      printNonTerm(pw, indentLevel);
-      myExp1.print(pw, indentLevel + 1);
-      printTerm(pw, indentLevel + 1, PLUS);
-      myExp2.print(pw, indentLevel + 1);
+        print(pw, indentLevel, PLUS);
     }
 }
 
@@ -612,10 +659,117 @@ class MinusExpr extends BinaryExpr {
     }
 
     public void print(PrintWriter pw, int indentLevel) {
-      printNonTerm(pw, indentLevel);
-      myExp1.print(pw, indentLevel + 1);
-      printTerm(pw, indentLevel + 1, MINUS);
-      myExp2.print(pw, indentLevel + 1);
+        print(pw, indentLevel, MINUS);
+    }
+}
+
+class TimesExpr extends BinaryExpr {
+    public TimesExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, TIMES);
+    }
+}
+
+class DivideExpr extends BinaryExpr {
+    public DivideExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, DIVIDE);
+    }
+}
+
+class PercentExpr extends BinaryExpr {
+    public PercentExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, PERCENT);
+    }
+}
+
+class AndExpr extends BinaryExpr {
+    public AndExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, AMPERSAND);
+    }
+}
+
+class OrExpr extends BinaryExpr {
+    public OrExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, VERTICALBAR);
+    }
+}
+
+class EqualsExpr extends BinaryExpr {
+    public EqualsExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, EQUALS);
+    }
+}
+
+class NotEqualsExpr extends BinaryExpr {
+    public NotEqualsExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, NE_OP);
+    }
+}
+
+class LessExpr extends BinaryExpr {
+    public LessExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, LESS);
+    }
+}
+
+class GreaterExpr extends BinaryExpr {
+    public GreaterExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, GREATER);
+    }
+}
+
+class LessEqExpr extends BinaryExpr {
+    public LessEqExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, LE_OP);
+    }
+}
+
+class GreaterEqExpr extends BinaryExpr {
+    public GreaterEqExpr(Expr exp1, Expr exp2) {
+        super(exp1, exp2);
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+        print(pw, indentLevel, GE_OP);
     }
 }
 
@@ -638,7 +792,7 @@ class AssignStmt extends Stmt {
         myLhs.print(pw, indentLevel + 1);
         printTerm(pw, indentLevel + 1, ASSIGN);
         myExp.print(pw, indentLevel + 1);
-        printTerm(pw, indentLevel, SEMICOLON);
+        printTerm(pw, indentLevel + 1, SEMICOLON);
     }
 
     private Expr myLhs;
@@ -657,4 +811,148 @@ class CallStmt extends Stmt {
   }
 
   private CallExpr myCallExpr;
+}
+
+class IfStmt extends Stmt {
+
+    public IfStmt(Expr exp, VarDeclList dlist, StmtList slist)
+    {
+      myVarDeclList = dlist;
+      myExp = exp;
+      myStmtList = slist;
+    }
+
+    public void print(PrintWriter p, int indent) {
+      printNonTerm(p, indent);
+      printTerm(p, indent + 1, IF);
+      printTerm(p, indent + 1, LPAREN);
+      myExp.print(p, indent + 1);
+      printTerm(p, indent + 1, RPAREN);
+      printTerm(p, indent + 1, LCURLY);
+      myVarDeclList.print(p, indent + 1);
+      myStmtList.print(p, indent + 1);
+      printTerm(p, indent + 1, RCURLY);
+    }
+
+    private Expr myExp;
+    private VarDeclList myVarDeclList;
+    private StmtList myStmtList;
+}
+
+class IfElseStmt extends Stmt {
+
+  public IfElseStmt(Expr exp, VarDeclList l1, StmtList stm1, VarDeclList l2, StmtList stm2) {
+    myExp = exp;
+    myVarDeclList1 = l1;
+	  myVarDeclList2 = l2;
+    myStmtList1 = stm1;
+    myStmtList2 = stm2;
+  }
+
+  public void print(PrintWriter p, int indent) {
+    printNonTerm(p, indent);
+    printTerm(p, indent + 1, IF);
+    printTerm(p, indent + 1, LPAREN);
+    myExp.print(p, indent + 1);
+    printTerm(p, indent + 1, RPAREN);
+    printTerm(p, indent + 1, LCURLY);
+    myVarDeclList1.print(p, indent + 1);
+    myStmtList1.print(p, indent + 1);
+    printTerm(p, indent + 1, RCURLY);
+    printTerm(p, indent + 1, ELSE);
+	  printTerm(p, indent + 1, LCURLY);
+    myVarDeclList2.print(p, indent + 1);
+    myStmtList2.print(p, indent + 1);
+    printTerm(p, indent + 1, RCURLY);
+  }
+
+  private Expr myExp;
+  private VarDeclList myVarDeclList1;
+  private VarDeclList myVarDeclList2;
+  private StmtList myStmtList1;
+  private StmtList myStmtList2;
+}
+
+class ForStmt extends Stmt {
+
+  public ForStmt(AssignStmt init, Expr cond, AssignStmt incr, VarDeclList declist, StmtList stmlist) {
+    myInit = init;
+    myCond = cond;
+    myIncr = incr;
+    myVarDeclList = declist;
+    myStmtList = stmlist;
+  }
+
+  public void print(PrintWriter p, int indent) {
+    printNonTerm(p, indent);
+    printTerm(p, indent+1, FOR);
+    printTerm(p, indent+1, LPAREN);
+    if (myInit != null)
+      myInit.print(p, indent+1);
+    else
+      printTerm(p, indent+1, SEMICOLON);
+    myCond.print(p, indent+1);
+    printTerm(p, indent+1, SEMICOLON);
+    if (myIncr != null)
+      myIncr.print(p, indent+1);
+    printTerm(p, indent+1, RPAREN);
+    printTerm(p, indent+1, LCURLY);
+    myVarDeclList.print(p, indent+1);
+    myStmtList.print(p, indent+1);
+    printTerm(p, indent+1, RCURLY);
+  }
+
+  private AssignStmt myInit;
+  private Expr myCond;
+  private AssignStmt myIncr;
+  private VarDeclList myVarDeclList;
+  private StmtList myStmtList;
+}
+
+class WhileStmt extends Stmt {
+
+  public WhileStmt(Expr exp, VarDeclList list, StmtList slist) {
+    myExp = exp;
+    myVarDeclList = list;
+    myStmtList = slist;
+  }
+
+  public void print(PrintWriter p, int indent) {
+    printNonTerm(p, indent);
+    printTerm(p, indent+1, WHILE);
+    printTerm(p, indent+1, LPAREN);
+    myExp.print(p, indent+1);
+    printTerm(p, indent+1, RPAREN);
+    printTerm(p, indent+1, LCURLY);
+    myVarDeclList.print(p, indent+1);
+    myStmtList.print(p, indent+1);
+    printTerm(p, indent+1, RCURLY);
+  }
+
+  private Expr myExp;
+  private VarDeclList myVarDeclList;
+  private StmtList myStmtList;
+}
+
+class ReturnStmt extends Stmt {
+  public ReturnStmt(Expr exp) {
+    myExp = exp;
+  }
+
+  public ReturnStmt() {
+    myExp = null;
+  }
+
+  public void print(PrintWriter p, int indent) {
+    printNonTerm(p, indent);
+    if (myExp == null) {
+      printTerm(p, indent+1, RETURN);
+    } else {
+      printTerm(p, indent+1, RETURN);
+      myExp.print(p, indent+1);
+    }
+    printTerm(p, indent+1, SEMICOLON);
+  }
+
+  private Expr myExp;
 }
