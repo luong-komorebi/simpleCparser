@@ -4,7 +4,6 @@ import java.util.*;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 
-
 abstract class AST implements sym {
   public static String indent = "  ";
 
@@ -63,8 +62,8 @@ class Program extends AST {
 }
 
 class DeclList extends AST {
-    public DeclList(LinkedList<?> S) {
-        myDecls = S;
+    public DeclList(LinkedList<?> D) {
+        myDecls = D;
     }
 
     public void print(PrintWriter pw, int indentLevel) {
@@ -82,16 +81,29 @@ class DeclList extends AST {
     protected LinkedList<?> myDecls;
 }
 
-class StructDeclList extends DeclList {
-    public StructDeclList(LinkedList<?> S) {
-        super(S);
-    }
+class VarDeclList extends AST {
+  public VarDeclList(LinkedList<?> D) {
+      myVarDecls = D;
+  }
 
+  public void print(PrintWriter pw, int indentLevel) {
+      Iterator<?> it = myVarDecls.iterator();
+      try {
+          printNonTerm(pw, indentLevel);
+          while (it.hasNext()) {
+              ((VarDecl)it.next()).print(pw, indentLevel + 1);
+          }
+      } catch (Exception e) {
+        e.printStackTrace(System.err);
+      }
+  }
+
+  protected LinkedList<?> myVarDecls;
 }
 
 class FormalsList extends AST {
-    public FormalsList(LinkedList<?> S) {
-        myFormals = S;
+    public FormalsList(LinkedList<?> F) {
+        myFormals = F;
     }
 
     public void print(PrintWriter pw, int indentLevel) {
@@ -113,22 +125,22 @@ class FormalsList extends AST {
 }
 
 class FuncBody extends AST {
-    public FuncBody(DeclList declList, StmtList stmtList) {
-        myDeclList = declList;
+    public FuncBody(VarDeclList varDeclList, StmtList stmtList) {
+        myVarDeclList = varDeclList;
         myStmtList = stmtList;
     }
-    // added
+
     public void print(PrintWriter pw, int indentLevel) {
         printNonTerm(pw, indentLevel);
         printTerm(pw, indentLevel + 1, LCURLY);
 
-        myDeclList.print(pw, indentLevel + 2);
-        myStmtList.print(pw, indentLevel + 2);
+        myVarDeclList.print(pw, indentLevel + 1);
+        myStmtList.print(pw, indentLevel + 1);
 
         printTerm(pw, indentLevel + 1, RCURLY);
     }
 
-    private DeclList myDeclList;
+    private VarDeclList myVarDeclList;
     private StmtList myStmtList;
 }
 
@@ -137,7 +149,6 @@ class StmtList extends AST {
         myStmts = S;
     }
 
-    // added
     public void print(PrintWriter pw, int indentLevel) {
         Iterator<?> it = myStmts.iterator();
         try {
@@ -153,9 +164,31 @@ class StmtList extends AST {
     private LinkedList<?> myStmts;
 }
 
+class ActualList extends AST {
+  public ActualList(LinkedList<?> E) {
+    myExprs = E;
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+      Iterator<?> it = myExprs.iterator();
+      try {
+          printNonTerm(pw, indentLevel);
+          while (it.hasNext()) {
+              ((Expr)it.next()).print(pw, indentLevel + 2);
+
+              if (it.hasNext())
+                printTerm(pw, indentLevel + 2, COMMA);
+          }
+      } catch (Exception e) {
+        e.printStackTrace(System.err);
+      }
+  }
+
+  private LinkedList<?> myExprs;
+}
+
 abstract class Decl extends AST {
-    // added
-    //public abstract void print(PrintWriter pw, int indentLevel);
+
 }
 
 class VarDecl extends Decl {
@@ -256,7 +289,6 @@ class IntType extends Type {
     }
 }
 
-// added
 class BoolType extends Type {
     public BoolType() {
     }
@@ -266,7 +298,6 @@ class BoolType extends Type {
     }
 }
 
-// added
 class DoubleType extends Type {
     public DoubleType() {
     }
@@ -285,6 +316,27 @@ class VoidType extends Type {
     }
 }
 
+class CharType extends Type {
+    public CharType() {
+    }
+
+    public String name() {
+        return "CHAR";
+    }
+}
+
+class StructType extends Type {
+  public StructType(ID id) {
+    myStructName = id;
+  }
+
+  public String name() {
+    return "STRUCT " + myStructName.getName();
+  }
+
+  private ID myStructName;
+}
+
 // **********************************************************************
 // Expr
 // **********************************************************************
@@ -293,19 +345,151 @@ abstract class Expr extends AST {
 
 }
 
-class IntLiteral extends Expr {
-    public IntLiteral(int intVal) {
-        myIntVal = intVal;
-    }
+abstract class Term extends Expr {
 
-    public void print(PrintWriter pw, int indent) {
-      printTerm(pw, indent, INTLITERAL, Integer.toString(myIntVal));
-    }
-
-    private int myIntVal;
 }
 
-class ID extends Expr {
+class IntLiteral extends Term {
+    public IntLiteral(String intVal) {
+        myIntVal = intVal;
+
+        try {
+          convertedInt = new Integer(myIntVal);
+        } catch (Exception e) {
+          convertedInt = null;
+        }
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+      printTerm(pw, indentLevel, INTLITERAL, myIntVal);
+    }
+
+    private String myIntVal;
+    private Integer convertedInt;
+}
+
+class RealLiteral extends Term {
+    public RealLiteral(String realVal) {
+        myRealVal = realVal;
+
+        try {
+          convertedReal = new Double(myRealVal);
+        } catch (Exception e) {
+          convertedReal = null;
+        }
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+      printTerm(pw, indentLevel, REALLITERAL, myRealVal);
+    }
+
+    private String myRealVal;
+    private Double convertedReal;
+}
+
+class StringLiteral extends Term {
+    public StringLiteral(String stringVal) {
+        myStringVal = stringVal;
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+      printTerm(pw, indentLevel, STRINGLITERAL, myStringVal);
+    }
+
+    private String myStringVal;
+}
+
+class CharLiteral extends Term {
+    public CharLiteral(String charVal) {
+        myCharVal = charVal;
+    }
+
+    public void print(PrintWriter pw, int indentLevel) {
+      printTerm(pw, indentLevel, CHARLITERAL, myCharVal);
+    }
+
+    private String myCharVal;
+}
+
+class True extends Term {
+  public True() {
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printTerm(pw, indentLevel, TRUE);
+  }
+}
+
+class False extends Term {
+  public False() {
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printTerm(pw, indentLevel, FALSE);
+  }
+}
+
+class Null extends Term {
+  public Null() {
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printTerm(pw, indentLevel, NULL);
+  }
+}
+
+class Sizeof extends Term {
+  public Sizeof(ID id) {
+    myId = id;
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printTerm(pw, indentLevel, SIZEOF);
+    printTerm(pw, indentLevel + 1, LPAREN);
+    myId.print(pw, indentLevel + 1);
+    printTerm(pw, indentLevel + 1, RPAREN);
+  }
+
+  private ID myId;
+}
+
+class BoundedExpr extends Term {
+  public BoundedExpr(Expr e) {
+    myExpr = e;
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printTerm(pw, indentLevel, LPAREN);
+    myExpr.print(pw, indentLevel);
+    printTerm(pw, indentLevel, RPAREN);
+  }
+
+  private Expr myExpr;
+}
+
+class CallExpr extends Term {
+  public CallExpr(ID id, ActualList A) {
+    myFuncName = id;
+    myActualList = A;
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printNonTerm(pw, indentLevel);
+    myFuncName.print(pw, indentLevel + 1);
+    printTerm(pw, indentLevel + 1, LPAREN);
+    myActualList.print(pw, indentLevel + 1);
+    printTerm(pw, indentLevel + 1, RPAREN);
+  }
+
+  private ID myFuncName;
+  private ActualList myActualList;
+}
+
+abstract class Loc extends Term {
+
+}
+
+class ID extends Loc {
     public ID(String strVal) {
         myStrVal = strVal;
     }
@@ -319,6 +503,84 @@ class ID extends Expr {
     }
 
     private String myStrVal;
+}
+
+class ArrayExpr extends Loc {
+  public ArrayExpr(Loc loc, Expr expr) {
+    myLoc = loc;
+    myExpr = expr;
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printNonTerm(pw, indentLevel);
+    myLoc.print(pw, indentLevel + 1);
+    printTerm(pw, indentLevel + 1, LSQBRACKET);
+    myExpr.print(pw, indentLevel + 1);
+    printTerm(pw, indentLevel + 1, RSQBRACKET);
+  }
+
+  private Loc myLoc;
+  private Expr myExpr;
+}
+
+class AccessLoc extends Loc {
+  public AccessLoc(Loc loc, ID id) {
+    myLoc = loc;
+    myId = id;
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    myLoc.print(pw, indentLevel);
+    printTerm(pw, indentLevel, FULLSTOP);
+    myId.print(pw, indentLevel);
+  }
+
+  private Loc myLoc;
+  private ID myId;
+}
+
+abstract class UnaryExpr extends Expr {
+  public UnaryExpr(Expr e) {
+    myExp = e;
+  }
+
+  protected Expr myExp;
+}
+
+class MinusUnaryExpr extends UnaryExpr {
+  public MinusUnaryExpr(Expr e) {
+    super(e);
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printNonTerm(pw, indentLevel);
+    printTerm(pw, indentLevel + 1, MINUS);
+    myExp.print(pw, indentLevel + 1);
+  }
+}
+
+class AddrOfExpr extends UnaryExpr {
+  public AddrOfExpr(Expr e) {
+    super(e);
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printNonTerm(pw, indentLevel);
+    printTerm(pw, indentLevel + 1, AMPERSAND);
+    myExp.print(pw, indentLevel + 1);
+  }
+}
+
+class NotExpr extends UnaryExpr {
+  public NotExpr(Expr e) {
+    super(e);
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+    printNonTerm(pw, indentLevel);
+    printTerm(pw, indentLevel + 1, BANG);
+    myExp.print(pw, indentLevel + 1);
+  }
 }
 
 abstract class BinaryExpr extends Expr {
@@ -337,7 +599,10 @@ class PlusExpr extends BinaryExpr {
     }
 
     public void print(PrintWriter pw, int indentLevel) {
-
+      printNonTerm(pw, indentLevel);
+      myExp1.print(pw, indentLevel + 1);
+      printTerm(pw, indentLevel + 1, PLUS);
+      myExp2.print(pw, indentLevel + 1);
     }
 }
 
@@ -347,7 +612,10 @@ class MinusExpr extends BinaryExpr {
     }
 
     public void print(PrintWriter pw, int indentLevel) {
-
+      printNonTerm(pw, indentLevel);
+      myExp1.print(pw, indentLevel + 1);
+      printTerm(pw, indentLevel + 1, MINUS);
+      myExp2.print(pw, indentLevel + 1);
     }
 }
 
@@ -366,9 +634,27 @@ class AssignStmt extends Stmt {
     }
 
     public void print(PrintWriter pw, int indentLevel) {
-
+        printNonTerm(pw, indentLevel);
+        myLhs.print(pw, indentLevel + 1);
+        printTerm(pw, indentLevel + 1, ASSIGN);
+        myExp.print(pw, indentLevel + 1);
+        printTerm(pw, indentLevel, SEMICOLON);
     }
 
     private Expr myLhs;
     private Expr myExp;
+}
+
+class CallStmt extends Stmt {
+  public CallStmt(CallExpr callExpr) {
+    myCallExpr = callExpr;
+  }
+
+  public void print(PrintWriter pw, int indentLevel) {
+      printNonTerm(pw, indentLevel);
+      myCallExpr.print(pw, indentLevel + 1);
+      printTerm(pw, indentLevel + 1, SEMICOLON);
+  }
+
+  private CallExpr myCallExpr;
 }

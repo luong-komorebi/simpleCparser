@@ -1,4 +1,26 @@
 void main(int a, int b) {
 	int a;
 	int b;
+	struct Book c;
+	bool d;
+	void kd;
+	char c;
+	double f;
+
+	a = NULL;
+	b = 6;
+	c = 0.54e-10;
+	d = '\n';
+	e = "A string!";
+	f = true;
+	f = TRUE;
+	g = false;
+	g = FALSE;
+	h = NULL;
+	a = (a + b) - 6;
+	u = swap(7, a);
+	
+	lk = !a;
+	kf = -b;
+	ru = &a;
 }

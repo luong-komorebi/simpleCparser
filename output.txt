@@ -15,14 +15,130 @@ Program
       RPAREN
       FuncBody
         LCURLY
-          DeclList
-            VarDecl
-              Type (INT)
+        VarDeclList
+          VarDecl
+            Type (INT)
+            ID (a)
+            SEMICOLON
+          VarDecl
+            Type (INT)
+            ID (b)
+            SEMICOLON
+          VarDecl
+            Type (STRUCT Book)
+            ID (c)
+            SEMICOLON
+          VarDecl
+            Type (BOOL)
+            ID (d)
+            SEMICOLON
+          VarDecl
+            Type (VOID)
+            ID (kd)
+            SEMICOLON
+          VarDecl
+            Type (CHAR)
+            ID (c)
+            SEMICOLON
+          VarDecl
+            Type (DOUBLE)
+            ID (f)
+            SEMICOLON
+        StmtList
+          AssignStmt
+            ID (a)
+            ASSIGN
+            NULL
+          SEMICOLON
+          AssignStmt
+            ID (b)
+            ASSIGN
+            INTLITERAL (6)
+          SEMICOLON
+          AssignStmt
+            ID (c)
+            ASSIGN
+            REALLITERAL (0.54e-10)
+          SEMICOLON
+          AssignStmt
+            ID (d)
+            ASSIGN
+            CHARLITERAL ('\n')
+          SEMICOLON
+          AssignStmt
+            ID (e)
+            ASSIGN
+            STRINGLITERAL ("A string!")
+          SEMICOLON
+          AssignStmt
+            ID (f)
+            ASSIGN
+            TRUE
+          SEMICOLON
+          AssignStmt
+            ID (f)
+            ASSIGN
+            TRUE
+          SEMICOLON
+          AssignStmt
+            ID (g)
+            ASSIGN
+            FALSE
+          SEMICOLON
+          AssignStmt
+            ID (g)
+            ASSIGN
+            FALSE
+          SEMICOLON
+          AssignStmt
+            ID (h)
+            ASSIGN
+            NULL
+          SEMICOLON
+          AssignStmt
+            ID (a)
+            ASSIGN
+            MinusExpr
+              LPAREN
+              PlusExpr
+                ID (a)
+                PLUS
+                ID (b)
+              RPAREN
+              MINUS
+              INTLITERAL (6)
+          SEMICOLON
+          AssignStmt
+            ID (u)
+            ASSIGN
+            CallExpr
+              ID (swap)
+              LPAREN
+              ActualList
+                  INTLITERAL (7)
+                  COMMA
+                  ID (a)
+              RPAREN
+          SEMICOLON
+          AssignStmt
+            ID (lk)
+            ASSIGN
+            NotExpr
+              BANG
               ID (a)
-              SEMICOLON
-            VarDecl
-              Type (INT)
+          SEMICOLON
+          AssignStmt
+            ID (kf)
+            ASSIGN
+            MinusUnaryExpr
+              MINUS
               ID (b)
-              SEMICOLON
-          StmtList
+          SEMICOLON
+          AssignStmt
+            ID (ru)
+            ASSIGN
+            AddrOfExpr
+              AMPERSAND
+              ID (a)
+          SEMICOLON
         RCURLY

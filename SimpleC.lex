@@ -99,7 +99,6 @@ CharLiteral = L? '(\\[^x\r\n] | [^\'\\\r\n] | \\x[a-fA-F0-9]+)+'
   "unsigned"		{ return symbol(UNSIGNED); }
   "volatile"		{ return symbol(VOLATILE); }
   "while"			{ return symbol(WHILE); }
-  "null"      { return symbol(NULL); }
   "NULL"      { return symbol(NULL); }
 
   /* punctuators */
@@ -140,7 +139,7 @@ CharLiteral = L? '(\\[^x\r\n] | [^\'\\\r\n] | \\x[a-fA-F0-9]+)+'
   "<="      { return symbol(LE_OP); }
   ">="      { return symbol(GE_OP); }
   "!="      { return symbol(NE_OP); }
-  ":"     { return symbol(SEMICOLON); }
+  ":"     { return symbol(COLON); }
   "."     { return symbol(FULLSTOP); }
   "&"     { return symbol(AMPERSAND); }
   "!"     { return symbol(BANG); }

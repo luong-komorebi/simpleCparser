@@ -33,10 +33,10 @@ terminal            WHILE;
 terminal            FOR;
 terminal            RETURN;
 terminal String     ID;
-terminal Integer    INTLITERAL;
+terminal String     INTLITERAL;
 terminal String     STRINGLITERAL;
-terminal Double     REALLITERAL;
-terminal Char       CHARLITERAL;
+terminal String     REALLITERAL;
+terminal String     CHARLITERAL;
 terminal            LCURLY;
 terminal            RCURLY;
 terminal            LSQBRACKET;
@@ -68,6 +68,7 @@ terminal            SUB_ASSIGN;
 terminal            MUL_ASSIGN;
 terminal            DIV_ASSIGN;
 terminal            PERCENT;
+terminal            COLON;
 
 terminal            EXTERN;
 terminal            COMMENTBLOCK;
@@ -115,29 +116,31 @@ terminal            FLOAT;
 
 /* Nonterminals */
 
-non terminal Program      program;
+non terminal Program          program;
 non terminal LinkedList       declList;
-non terminal Decl           decl;
+non terminal Decl             decl;
 non terminal LinkedList       varDeclList;
-non terminal VarDecl      varDecl;
-non terminal FuncDef       funcDef;
-non terminal FormalsList  formals;
-non terminal FuncBody       funcBody;
+non terminal VarDecl          varDecl;
+non terminal FuncDef          funcDef;
+non terminal FormalsList      formals;
+non terminal FuncBody         funcBody;
 non terminal LinkedList       stmtList;
-non terminal Stmt         stmt;
-non terminal Expr          exp;
-non terminal Expr          term;
-non terminal Type           type;
-non terminal Expr          loc;
-non terminal ID           id;
-non terminal Stmt         assignStmt;
+non terminal Stmt             stmt;
+non terminal Expr             exp;
+non terminal Term             term;
+non terminal Type             type;
+non terminal Loc              loc;
+non terminal ID               id;
+non terminal Stmt             assignStmt;
 
-// added
-non terminal FormalDecl formalDecl;
-non terminal LinkedList formalsList;
-
-non terminal BinaryExpr     binaryExpr;
-
+non terminal FormalDecl       formalDecl;
+non terminal LinkedList       formalsList;
+non terminal BinaryExpr       binaryExpr;
+non terminal ArrayExpr        arrayExpr;
+non terminal LinkedList       actualList;
+non terminal CallExpr         callExpr;
+non terminal CallStmt         callStmt;
+non terminal UnaryExpr        unaryExpr;
 
 precedence left PLUS, MINUS;
 
@@ -158,7 +161,8 @@ decl ::= varDecl: v {: RESULT = v; :}
        | funcDef: f {: RESULT = f; :}
        ;
 
-/* http://www2.cs.tum.edu/projects/cup/
+/*
+http://www2.cs.tum.edu/projects/cup/
 LALR
 */
 varDecl ::= type: t id: i SEMICOLON
@@ -186,7 +190,7 @@ formalDecl ::= type: t id: i {: RESULT = new FormalDecl(t, i); :}
           ;
 
 funcBody ::= LCURLY varDeclList: v stmtList: s RCURLY
-              {: RESULT = new FuncBody(new DeclList(v), new StmtList(s)); :}
+              {: RESULT = new FuncBody(new VarDeclList(v), new StmtList(s)); :}
          ;
 
 varDeclList ::= varDeclList: l varDecl: var {: l.addLast(var); RESULT = l; :}
@@ -197,14 +201,24 @@ stmtList ::= stmtList: l stmt: s {: l.addLast(s); RESULT = l; :}
           |  /* epsilon */ {: RESULT = new LinkedList(); :}
           ;
 
-stmt ::= assignStmt:a SEMICOLON {: RESULT = a; :}
+stmt ::= assignStmt: a SEMICOLON {: RESULT = a; :}
+        | callStmt: c {: RESULT = c; :}
       ;
 
 assignStmt ::= loc: l ASSIGN exp: e {: RESULT = new AssignStmt(l, e); :}
          ;
 
+callStmt ::= callExpr: c SEMICOLON {: RESULT = new CallStmt(c); :}
+      ;
+
 exp ::= binaryExpr: b {: RESULT = b; :}
       | term: t {: RESULT = t; :}
+      | unaryExpr: u {: RESULT = u; :}
+      ;
+
+unaryExpr ::= AMPERSAND exp: e {: RESULT = new AddrOfExpr(e); :}
+      | BANG exp: e {: RESULT = new NotExpr(e); :}
+      | MINUS exp: e {: RESULT = new MinusUnaryExpr(e); :}
       ;
 
 binaryExpr ::= exp: e1 PLUS exp: e2 {: RESULT = new PlusExpr(e1, e2); :}
@@ -213,13 +227,41 @@ binaryExpr ::= exp: e1 PLUS exp: e2 {: RESULT = new PlusExpr(e1, e2); :}
 
 term ::= loc: l {: RESULT = l; :}
        | INTLITERAL: i {: RESULT = new IntLiteral(i); :}
+       | REALLITERAL: r {: RESULT = new RealLiteral(r); :}
+       | STRINGLITERAL: s {: RESULT = new StringLiteral(s); :}
+       | CHARLITERAL: c {: RESULT = new CharLiteral(c); :}
+       | TRUE {: RESULT = new True(); :}
+       | FALSE {: RESULT = new False(); :}
+       | NULL {: RESULT = new Null(); :}
+       | callExpr: c {: RESULT = c; :}
+       | SIZEOF LPAREN id: i RPAREN {: RESULT = new Sizeof(i); :}
+       | LPAREN exp: e RPAREN {: RESULT = new BoundedExpr(e); :}
        ;
+
+callExpr ::=  id: i LPAREN actualList: a RPAREN {: RESULT = new CallExpr(i, new ActualList(a)); :}
+      ;
+
+actualList ::= exp: e {: LinkedList<Expr> list = new LinkedList<Expr>();
+                list.addLast(e);
+                RESULT = list; :}
+      | actualList: al COMMA exp: e {: al.addLast(e); RESULT = al; :}
+      | /* epsilon */ {: RESULT = new LinkedList(); :}
+      ;
 
 type ::= INT {: RESULT = new IntType(); :}
        | VOID {: RESULT = new VoidType(); :}
+       | BOOL {: RESULT = new BoolType(); :}
+       | DOUBLE {: RESULT = new DoubleType(); :}
+       | CHAR {: RESULT = new CharType(); :}
+       | STRUCT id: i {: RESULT = new StructType(i); :}
        ;
 
 loc ::= id: i {: RESULT = i; :}
+      | arrayExpr: a {: RESULT = a; :}
+      | loc: l FULLSTOP id: i {: RESULT = new AccessLoc(l, i); :}
+      ;
+
+arrayExpr ::= loc: l LSQBRACKET exp: e RSQBRACKET {: RESULT = new ArrayExpr(l, e); :}
       ;
 
 id ::= ID: i {: RESULT = new ID(i); :}
